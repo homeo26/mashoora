@@ -1,0 +1,13 @@
+package com.just.mashoora;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MashooraApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MashooraApplication.class, args);
+	}
+
+}
