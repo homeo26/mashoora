@@ -1,6 +1,8 @@
 package com.just.mashoora.components;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +12,11 @@ import java.util.List;
 
 @Setter
 @Getter
+@Entity
 public class Question {
+
+    @Id
+    private Long id;
 
     private String customerId;
 
@@ -21,7 +27,7 @@ public class Question {
 
     private Timestamp dateCreated;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<Answer> answers;
 
 }

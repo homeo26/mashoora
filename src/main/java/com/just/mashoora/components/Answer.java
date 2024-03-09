@@ -46,6 +46,10 @@ public class Answer {
     )
     private Set<Lawyer> downVoters = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
+
     private int totalVotes = 0;
 
 }
