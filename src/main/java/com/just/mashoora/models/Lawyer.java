@@ -17,6 +17,10 @@ import java.util.Set;
 @Entity
 public class Lawyer extends User {
 
+    @NotNull
+    @Column(nullable = false)
+    @Id
+    private Long id;
 
     @NotNull
     @Column(nullable = false)

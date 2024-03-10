@@ -2,7 +2,13 @@ package com.just.mashoora.components;
 
 import com.just.mashoora.models.Customer;
 import com.just.mashoora.models.Lawyer;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +22,6 @@ public class Complaint {
 
     @Column(nullable = false)
     private String complaintNote;
-
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

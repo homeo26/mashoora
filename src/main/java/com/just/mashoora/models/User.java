@@ -14,11 +14,6 @@ public class User {
 
     @NotNull
     @Column(nullable = false)
-    @Id
-    private String id;
-
-    @NotNull
-    @Column(nullable = false)
     private String firstName;
 
     @NotNull

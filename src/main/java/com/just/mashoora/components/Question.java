@@ -24,7 +24,6 @@ public class Question {
 
     private String body;
 
-
     private Timestamp dateCreated;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
