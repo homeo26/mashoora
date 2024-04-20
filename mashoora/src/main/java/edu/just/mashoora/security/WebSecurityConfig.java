@@ -68,6 +68,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers("api/comments/**").permitAll()
                         .requestMatchers("api/questions/**").permitAll()
+                        .requestMatchers("api/adel").permitAll()
                         .anyRequest().authenticated()
                 );
 
