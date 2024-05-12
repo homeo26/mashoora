@@ -60,15 +60,17 @@ app = Flask(__name__)
 def call_adel():
     data = request.json
     query = data.get('query')
-    previousConversations = data.get('previousConversations')
+    previous_conversations = data.get('previousConversations')
 
     if query is None:
         return jsonify({'error': 'Query is a required field'}), 400
 
-    convo = model.start_chat(history=previousConversations)
-    convo.send_message(query)
-
-    return jsonify(convo.last.text)
+    convo = model.start_chat(history=previous_conversations)
+    try:
+        convo.send_message(query)
+        return jsonify(convo.last.text)
+    except:
+        return jsonify({'error': 'Error sending message or retrieving response'}), 500
 
 
 if __name__ == "__main__":
