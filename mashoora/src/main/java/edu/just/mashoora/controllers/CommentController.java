@@ -1,7 +1,7 @@
 package edu.just.mashoora.controllers;
 
-import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.payload.request.CommentRequest;
+import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.services.CommentServiceImpl;
 import edu.just.mashoora.utils.StandardResponse;
 import jakarta.validation.Valid;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
@@ -28,15 +26,15 @@ public class CommentController {
     @PostMapping("/{questionId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
     public ResponseEntity<?> postComment(@PathVariable Long questionId, @Valid @RequestBody CommentRequest commentRequest) {
-        StandardResponse<String> response = new StandardResponse<>();
+        StandardResponse<CommentResponse> response = new StandardResponse<>();
 
         // Create a new comment on the specified question
-        Comment comment = commentService.postComment(questionId, commentRequest);
+        CommentResponse commentResponse = commentService.postComment(questionId, commentRequest);
 
         response.setStatus(HttpStatus.CREATED.getReasonPhrase());
         response.setStatusCode(HttpStatus.CREATED.value());
         response.setDetailedStatusCode("Comment posted successfully on Question " + questionId);
-        response.setData(comment.getContent());
+        response.setData(commentResponse);
 
         return ResponseEntity.status(HttpStatus.CREATED.value()).body(response);
     }
@@ -44,25 +42,15 @@ public class CommentController {
     @GetMapping("/{commentId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
     public ResponseEntity<?> getCommentById(@PathVariable Long commentId) {
-        StandardResponse<String> response = new StandardResponse<>();
+        StandardResponse<CommentResponse> response = new StandardResponse<>();
 
         // Retrieve the comment by ID
-        Optional<Comment> comment = commentService.getCommentById(commentId);
+        CommentResponse commentResponse = commentService.getCommentById(commentId);
 
-        // Check if the comment exists
-        if (comment.isPresent()) {
-            response.setStatus(HttpStatus.OK.getReasonPhrase());
-            response.setStatusCode(HttpStatus.OK.value());
-            response.setDetailedStatusCode("Comment retrieved successfully");
-            response.setData(comment.get().getContent());
-            return ResponseEntity.status(HttpStatus.OK.value()).body(response);
-
-        } else {
-            response.setStatus(HttpStatus.NOT_FOUND.getReasonPhrase());
-            response.setStatusCode(HttpStatus.NOT_FOUND.value());
-            response.setDetailedStatusCode("No such comment with this ID" + commentId + " was found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(response);
-
-        }
+        response.setStatus(HttpStatus.OK.getReasonPhrase());
+        response.setStatusCode(HttpStatus.OK.value());
+        response.setDetailedStatusCode("Comment retrieved successfully");
+        response.setData(commentResponse);
+        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
     }
 }

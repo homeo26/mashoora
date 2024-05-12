@@ -1,13 +1,15 @@
 package edu.just.mashoora.services;
 
-import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.payload.request.CommentRequest;
+import edu.just.mashoora.payload.response.CommentResponse;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface CommentService {
 
-    Comment postComment(Long questionId, CommentRequest commentRequest);
+    CommentResponse postComment(Long questionId, CommentRequest commentRequest);
 
-    Optional<Comment> getCommentById(Long commentId);
+    CommentResponse getCommentById(Long commentId);
+
+    List<CommentResponse> getCommentsByQuestionId(Long questionId);
 }

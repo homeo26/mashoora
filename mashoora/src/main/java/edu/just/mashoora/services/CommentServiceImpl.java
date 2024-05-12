@@ -4,6 +4,7 @@ import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.components.Question;
 import edu.just.mashoora.models.User;
 import edu.just.mashoora.payload.request.CommentRequest;
+import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.repository.CommentRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
@@ -14,7 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -29,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
     private UserRepository userRepository;
 
     @Transactional
-    public Comment postComment(Long questionId, CommentRequest commentRequest) {
+    public CommentResponse postComment(Long questionId, CommentRequest commentRequest) {
         // Find the question by ID
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
@@ -51,12 +53,23 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(authenticatedUser);
 
         // Save the comment
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+
+        return new CommentResponse(comment);
     }
 
 
-    public Optional<Comment> getCommentById(Long commentId) {
-        // Retrieve the comment by ID
-        return commentRepository.findById(commentId);
+    public CommentResponse getCommentById(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + commentId));
+        return new CommentResponse(comment);
+    }
+
+    @Override
+    public List<CommentResponse> getCommentsByQuestionId(Long questionId) {
+        List<Comment> comments = commentRepository.findByQuestionId(questionId);
+        return comments.stream()
+                .map(CommentResponse::new)
+                .collect(Collectors.toList());
     }
 }

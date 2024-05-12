@@ -4,17 +4,22 @@ import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.components.Question;
 import edu.just.mashoora.models.User;
 import edu.just.mashoora.payload.request.QuestionRequest;
+import edu.just.mashoora.payload.response.CommentResponse;
+import edu.just.mashoora.payload.response.QuestionResponse;
+import edu.just.mashoora.repository.CommentRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -23,10 +28,13 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionRepository questionRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     UserRepository userRepository;
 
     @Transactional
-    public Question postQuestion(QuestionRequest questionRequest) {
+    public QuestionResponse postQuestion(QuestionRequest questionRequest) {
         // Get the authenticated user details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -44,22 +52,37 @@ public class QuestionServiceImpl implements QuestionService {
         question.setUser(authenticatedUser);
 
         // Save the question
-        return questionRepository.save(question);
+        Question savedQuestion = questionRepository.save(question);
+
+        return QuestionResponse.builder()
+                .id(savedQuestion.getId())
+                .title(savedQuestion.getTitle())
+                .content(savedQuestion.getContent())
+                .comments(null)
+                .timestamp(savedQuestion.getTimestamp())
+                .userId(savedQuestion.getUser().getId())
+                .build();
     }
 
-    public Optional<Question> getQuestionById(Long questionId) {
-        // Retrieve the question by ID
-        return questionRepository.findById(questionId);
-    }
-
-
-
-    public Set<Comment> getAllCommentsOfQuestion(Long questionId) {
-        // Find the question by ID
+    public QuestionResponse getQuestionById(Long questionId) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
+                .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + questionId));
 
-        // Return all comments associated with the question
-        return question.getComments();
+        return new QuestionResponse(question);
+    }
+
+    @Override
+    public List<CommentResponse> getAllCommentsOfQuestion(Long questionId) {
+        List<Comment> comments = commentRepository.findByQuestionId(questionId);
+        return comments.stream()
+                .map(CommentResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public Page<QuestionResponse> getQuestionsByPage(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Question> questionPage = questionRepository.findAllByOrderByTimestampDesc(pageable);
+
+        return questionPage.map(QuestionResponse::new);
     }
 }
