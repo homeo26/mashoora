@@ -18,22 +18,33 @@ parties.
 In able to run the application fully, These are the prerequisites:
 
 1. Clone the repository
-```bash
-git clone https://github.com/homeo26/mashoora.git
-```
+
+   ```bash
+   git clone https://github.com/homeo26/mashoora.git
+   ```
+
 2. Navigate to the project directory.
 
-```bash 
+   ```bash 
    cd mashoora
-```
-3. You must edit the `application.properties`.
-4. You must run the Spring boot server
-5. To activate the lawyer bot **Adel**, you must install those libraries:
+   ```
 
-```bash
-# You might need to use 'sudo' before the commands
-# You might need to install the libraries in virtual environments like conda or venv
-pip install google-generativeai
-pip install flask flask-sqlalchemy
-```
-6. Run the python Flask app
+3. You must edit the `application.properties` by inserting your database configs, API keys etc.
+4. Make sure to run those `SQL` commands to allow the Role Relationships to be activated as the following
+   commands:
+    ```sql
+    INSERT INTO roles(name) VALUES('ROLE_CUSTOMER');
+    INSERT INTO roles(name) VALUES('ROLE_LAWYER');
+    INSERT INTO roles(name) VALUES('ROLE_ADMIN');
+    ```
+5. You must run the Spring boot server
+6. To activate the lawyer bot **Adel**, you must install those libraries:
+
+   ```bash
+   # You might need to use 'sudo' before the commands
+   # You might need to install the libraries in virtual environments like conda or venv
+   pip install google-generativeai
+   pip install flask flask-sqlalchemy
+   ```
+
+7. Run the python Flask app.
