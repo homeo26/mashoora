@@ -61,6 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .comments(null)
                 .timestamp(savedQuestion.getTimestamp())
                 .userId(savedQuestion.getUser().getId())
+                .username(savedQuestion.getUser().getUsername())
                 .build();
     }
 

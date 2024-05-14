@@ -18,6 +18,8 @@ public class CommentResponse {
 
     private Long userId;
 
+    private String username;
+
     private Long questionId;
 
     private Timestamp timestamp;
@@ -26,6 +28,7 @@ public class CommentResponse {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.userId = comment.getUser().getId();
+        this.username = comment.getUser().getUsername();
         this.questionId = comment.getQuestion().getId();
         this.timestamp = comment.getTimestamp();
     }
