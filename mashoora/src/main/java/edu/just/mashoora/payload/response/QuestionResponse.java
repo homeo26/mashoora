@@ -23,6 +23,10 @@ public class QuestionResponse {
 
     private Long userId;
 
+    private String firstName;
+
+    private String lastName;
+
     private String username;
 
     private Timestamp timestamp;
@@ -34,6 +38,8 @@ public class QuestionResponse {
         this.title = question.getTitle();
         this.content = question.getContent();
         this.userId = question.getUser().getId();
+        this.firstName = question.getUser().getFirstName();
+        this.lastName = question.getUser().getLastName();
         this.username = question.getUser().getUsername();
         this.timestamp = question.getTimestamp();
         this.comments = question.getComments().stream().map(CommentResponse::new).toList();

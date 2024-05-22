@@ -43,6 +43,12 @@ public class User {
     private String username;
 
     @NotBlank
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
+
+    @NotBlank
     @Size(max = 50)
     @Email
     private String email;
@@ -50,6 +56,10 @@ public class User {
     @NotBlank
     @Size(max = 120)
     private String password;
+
+    private boolean enabled = false;
+
+    private String verificationToken;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

@@ -25,7 +25,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Autowired
     ChatbotRepository chatbotRepository;
 
-    private final String geminiApiUrl = Constants.GEMINI_API_URL;
+    private final String geminiApiUrl = Constants.ADEL_CHATBOT_API_URL;
 
     @Override
     public ChatbotQueryResponse sendQuery(Long senderId, ChatbotQueryRequest request) {

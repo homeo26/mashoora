@@ -38,8 +38,8 @@ public class ChatbotController {
         Long senderId = userDetails.getId();
 
         ChatbotQueryResponse botResponse = chatbotService.sendQuery(senderId, request);
-        response.setStatus(HttpStatus.OK.getReasonPhrase());
-        response.setStatusCode(HttpStatus.OK.value());
+        response.setStatus(HttpStatus.CREATED.getReasonPhrase());
+        response.setStatusCode(HttpStatus.CREATED.value());
         response.setDetailedStatusCode("Query Sent successfully");
         response.setData(botResponse);
 
@@ -62,7 +62,7 @@ public class ChatbotController {
         response.setDetailedStatusCode("History retrieved successfully");
         response.setData(history);
 
-        return ResponseEntity.status(HttpStatus.CREATED.value()).body(response);
+        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
     }
 
     @DeleteMapping("/history")
@@ -82,7 +82,7 @@ public class ChatbotController {
         response.setDetailedStatusCode("History deleted successfully");
         response.setData("Chat history with adel was deleted succesfuly");
 
-        return ResponseEntity.status(HttpStatus.CREATED.value()).body(response);
+        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
 
     }
 }
