@@ -1,6 +1,7 @@
 package edu.just.mashoora.controllers;
 
 
+import edu.just.mashoora.constants.ELawTypes;
 import edu.just.mashoora.constants.ERole;
 import edu.just.mashoora.jwt.JwtUtils;
 import edu.just.mashoora.models.Role;
@@ -199,12 +200,12 @@ public class AuthController {
             Path filePath = Paths.get(uploadDir+"/", fileName);
 
             Files.write(filePath, file.getBytes());
-            List<String> fields = ratingService.selectedAttributes(civilLaw, commercialLaw,
+            List<ELawTypes> fields = ratingService.selectedAttributes(civilLaw, commercialLaw,
                     internationalLaw, criminalLaw, administrativeAndFinancialLaw,
                     constitutionalLaw, privateInternationalLaw, proceduralLaw);
 
             if (!fields.isEmpty()) {
-                for (String field : fields) {
+                for (ELawTypes field : fields) {
                     ratingService.saveRating(id, field, 5);
                 }
             }

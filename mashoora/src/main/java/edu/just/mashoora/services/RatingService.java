@@ -6,7 +6,7 @@ import edu.just.mashoora.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import edu.just.mashoora.constants.ELawTypes;
 import java.util.ArrayList;
 
 @Service
@@ -19,62 +19,62 @@ public class RatingService {
     UserRepository userRepository;
 
 
-    public void saveRating(long id, String field, int rate) {
+    public void saveRating(long id, ELawTypes field, int rate) {
         Rating rating = getRating(id);
         switch (field) {
-            case "civilLaw":
+            case CIVIL_LAW:
                 rating.setCivilLawRating(rating.getCivilLawRating()+rate);
                 break;
-            case "commercialLaw":
+            case COMMERCIAL_LAW:
                 rating.setCommercialLawRating(rating.getCommercialLawRating()+rate);
                 break;
-            case "internationalLaw":
+            case INTERNATIONAL_LAW:
                 rating.setInternationalLawRating(rating.getInternationalLawRating()+rate);
                 break;
-            case "criminalLaw":
+            case CRIMINAL_LAW:
                 rating.setCriminalLawRating(rating.getCriminalLawRating()+rate);
                 break;
-            case "administrativeAndFinancialLaw":
+            case ADMINISTRATIVE_AND_FINANCE_LAW:
                 rating.setAdministrativeAndFinancialLawRating(rating.getAdministrativeAndFinancialLawRating()+rate);
                 break;
-            case "constitutionalLaw":
+            case CONSTITUTIONAL_LAW:
                 rating.setConstitutionalLawRating(rating.getConstitutionalLawRating()+rate);
                 break;
-            case "privateInternationalLaw":
+            case PRIVATE_INTERNATIONAL_LAW:
                 rating.setPrivateInternationalLawRating(rating.getPrivateInternationalLawRating()+rate);
                 break;
-            case "proceduralLaw":
+            case PROCEDURAL_LAW:
                 rating.setProceduralLawRating(rating.getProceduralLawRating()+rate);
                 break;
         }
         ratingRepository.save(rating);
     }
 
-    public void increaseCasesCount(long id, @NotNull String field) {
+    public void increaseCasesCount(long id, @NotNull ELawTypes field) {
         Rating rating = getRating(id);
         switch (field) {
-            case "civilLaw":
+            case CIVIL_LAW:
                 rating.setCivilCasesCounter(rating.getCivilCasesCounter()+1);
                 break;
-            case "commercialLaw":
+            case COMMERCIAL_LAW:
                 rating.setCommercialCasesCounter(rating.getCommercialCasesCounter()+1);
                 break;
-            case "internationalLaw":
+            case INTERNATIONAL_LAW:
                 rating.setInternationalLawRating(rating.getInternationalCasesCounter()+1);
                 break;
-            case "criminalLaw":
+            case CRIMINAL_LAW:
                 rating.setCriminalLawRating(rating.getCriminalCasesCounter()+1);
                 break;
-            case "administrativeAndFinancialLaw":
+            case ADMINISTRATIVE_AND_FINANCE_LAW:
                 rating.setAdministrativeAndFinancialLawRating(rating.getAdministrativeAndFinancialCasesCounter()+1);
                 break;
-            case "constitutionalLaw":
+            case CONSTITUTIONAL_LAW:
                 rating.setConstitutionalLawRating(rating.getConstitutionalCasesCounter()+1);
                 break;
-            case "privateInternationalLaw":
+            case PRIVATE_INTERNATIONAL_LAW:
                 rating.setPrivateInternationalLawRating(rating.getPrivateInternationalCasesCounter()+1);
                 break;
-            case "proceduralLaw":
+            case PROCEDURAL_LAW:
                 rating.setProceduralLawRating(rating.getProceduralCasesCounter()+1);
                 break;
         }
@@ -91,16 +91,16 @@ public class RatingService {
         return rating;
     }
 
-    public ArrayList<String> selectedAttributes(Integer civilLaw, Integer commercialLaw, Integer internationalLaw, Integer criminalLaw, Integer administrativeAndFinancialLaw, Integer constitutionalLaw, Integer privateInternationalLaw, Integer proceduralLaw){
-        ArrayList<String> fields = new ArrayList<>();
-        if (civilLaw != null) fields.add("civilLaw");
-        if (commercialLaw != null) fields.add("commercialLaw");
-        if (internationalLaw != null) fields.add("internationalLaw");
-        if (criminalLaw != null) fields.add("criminalLaw");
-        if (administrativeAndFinancialLaw != null) fields.add("administrativeAndFinancialLaw");
-        if (constitutionalLaw != null) fields.add("constitutionalLaw");
-        if (privateInternationalLaw != null) fields.add("privateInternationalLaw");
-        if (proceduralLaw != null) fields.add("proceduralLaw");
+    public ArrayList<ELawTypes> selectedAttributes(Integer civilLaw, Integer commercialLaw, Integer internationalLaw, Integer criminalLaw, Integer administrativeAndFinancialLaw, Integer constitutionalLaw, Integer privateInternationalLaw, Integer proceduralLaw){
+        ArrayList<ELawTypes> fields = new ArrayList<>();
+        if (civilLaw != null) fields.add(ELawTypes.CIVIL_LAW);
+        if (commercialLaw != null) fields.add(ELawTypes.COMMERCIAL_LAW);
+        if (internationalLaw != null) fields.add(ELawTypes.INTERNATIONAL_LAW);
+        if (criminalLaw != null) fields.add(ELawTypes.CRIMINAL_LAW);
+        if (administrativeAndFinancialLaw != null) fields.add(ELawTypes.ADMINISTRATIVE_AND_FINANCE_LAW);
+        if (constitutionalLaw != null) fields.add(ELawTypes.CONSTITUTIONAL_LAW);
+        if (privateInternationalLaw != null) fields.add(ELawTypes.PRIVATE_INTERNATIONAL_LAW);
+        if (proceduralLaw != null) fields.add(ELawTypes.PROCEDURAL_LAW);
         return fields;
     }
 }
