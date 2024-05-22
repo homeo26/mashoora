@@ -12,6 +12,7 @@ import edu.just.mashoora.payload.response.MessageResponse;
 import edu.just.mashoora.repository.RoleRepository;
 import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.EmailVerificationServiceImpl;
+import edu.just.mashoora.services.RatingService;
 import edu.just.mashoora.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +48,9 @@ public class AuthController {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    private RatingService ratingService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -169,6 +172,50 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email for verification."));
     }
+
+    @PostMapping("/LawyerDetails/{id}")
+    public ResponseEntity<String> requiredLawyerInfo(@PathVariable Long id,
+                                                     @RequestParam("file") MultipartFile file,
+                                                     @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
+                                                     @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
+                                                     @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
+                                                     @RequestParam(value = "criminalLaw", required = false) Integer criminalLaw,
+                                                     @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
+                                                     @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
+                                                     @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
+                                                     @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw) throws IOException {
+
+        if (!file.getContentType().equals("application/pdf")) {
+            return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
+        }
+
+        try {
+            String fileName = id + ".pdf";
+
+            Path uploadDir = Paths.get("uploads");
+            if (!Files.exists(uploadDir))
+                Files.createDirectories(uploadDir);
+
+            Path filePath = Paths.get(uploadDir+"/", fileName);
+
+            Files.write(filePath, file.getBytes());
+            List<String> fields = ratingService.selectedAttributes(civilLaw, commercialLaw,
+                    internationalLaw, criminalLaw, administrativeAndFinancialLaw,
+                    constitutionalLaw, privateInternationalLaw, proceduralLaw);
+
+            if (!fields.isEmpty()) {
+                for (String field : fields) {
+                    ratingService.saveRating(id, field, 5);
+                }
+            }
+
+            return ResponseEntity.ok("request sent successfully");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Error sending request: " + e.getMessage());
+        }
+
+    }
+
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyUser(@RequestParam("userId") Long userId, @RequestParam("token") String token) {
