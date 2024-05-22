@@ -62,4 +62,9 @@ public class TestController {
 
         return ResponseEntity.status(HttpStatus.OK.value()).body(response);
     }
+
+    @GetMapping("/testAuth")
+    public String testAuth() {
+        return "Test Auth";
+    }
 }
