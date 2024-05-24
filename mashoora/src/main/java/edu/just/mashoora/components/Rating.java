@@ -57,4 +57,37 @@ public class Rating {
 
     private int privateInternationalCasesCounter;
 
+    //--------------------------------------------------
+
+
+    public float calculateAdministrativeAndFinancialLawRating() {
+        return calculateFieldRating(administrativeAndFinancialLawRating, administrativeAndFinancialCasesCounter);
+    }
+    public float calculateConstitutionalLawRating() {
+       return calculateFieldRating(constitutionalLawRating, constitutionalCasesCounter);
+    }
+    public float calculateCivilLawRating() {
+        return calculateFieldRating(civilLawRating, civilCasesCounter);
+    }
+    public float calculateCommercialLawRating() {
+        return calculateFieldRating(commercialLawRating, commercialCasesCounter);
+    }
+    public float calculateInternationalLawRating() {
+        return calculateFieldRating(internationalLawRating, internationalCasesCounter);
+    }
+    public float calculateCriminalLawRating() {
+        return calculateFieldRating(criminalLawRating, criminalCasesCounter);
+    }
+    public float calculateProceduralLawRating() {
+        return calculateFieldRating(proceduralLawRating, proceduralCasesCounter);
+    }
+    public float calculatePrivateInternationalLawRating() {
+        return calculateFieldRating(privateInternationalLawRating, privateInternationalCasesCounter);
+    }
+    private float calculateFieldRating(float fieldRating, int fieldCounter){
+        if(fieldCounter == 0)
+            return fieldRating;
+        return (float) ((fieldRating-5) / fieldCounter);
+    }
+
 }

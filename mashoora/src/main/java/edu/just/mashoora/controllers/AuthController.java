@@ -1,19 +1,19 @@
 package edu.just.mashoora.controllers;
 
 
-import edu.just.mashoora.components.ChangePasswordOTP;
 import edu.just.mashoora.constants.ELawTypes;
 import edu.just.mashoora.constants.ERole;
 import edu.just.mashoora.jwt.JwtUtils;
 import edu.just.mashoora.models.Role;
 import edu.just.mashoora.models.User;
+import edu.just.mashoora.payload.request.ChangePasswordRequest;
 import edu.just.mashoora.payload.request.LoginRequest;
 import edu.just.mashoora.payload.request.SignupRequest;
 import edu.just.mashoora.payload.response.JwtResponse;
 import edu.just.mashoora.payload.response.MessageResponse;
 import edu.just.mashoora.repository.RoleRepository;
 import edu.just.mashoora.repository.UserRepository;
-import edu.just.mashoora.services.EmailVerificationServiceImpl;
+import edu.just.mashoora.services.EmailServiceImpl;
 import edu.just.mashoora.services.RatingService;
 import edu.just.mashoora.services.UserDetailsImpl;
 import edu.just.mashoora.services.UserDetailsServiceImpl;
@@ -23,12 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -60,7 +59,7 @@ public class AuthController {
     PasswordEncoder encoder;
 
     @Autowired
-    EmailVerificationServiceImpl emailService;
+    EmailServiceImpl emailService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -68,7 +67,6 @@ public class AuthController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
-    Logger logger = Logger.getLogger(AuthController.class.getName());
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -84,7 +82,7 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(
@@ -104,7 +102,6 @@ public class AuthController {
 
         String username = signUpRequest.getUsername();
         String email = signUpRequest.getEmail();
-        logger.fine("here");
         // Check if username exists
         if (userRepository.existsByUsername(username)) {
             return ResponseEntity
@@ -183,7 +180,7 @@ public class AuthController {
     }
 
     @PostMapping("/lawyerDetails/{id}")
-    public ResponseEntity<String> requiredLawyerInfo(@PathVariable Long id,
+    public ResponseEntity<String> requiredLawyerInfo(@PathVariable("id") Long id,
                                                      @RequestParam("file") MultipartFile file,
                                                      @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
                                                      @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
@@ -192,7 +189,7 @@ public class AuthController {
                                                      @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
                                                      @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
                                                      @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
-                                                     @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw) throws IOException {
+                                                     @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw){
 
         if (!file.getContentType().equals("application/pdf")) {
             return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
@@ -236,17 +233,17 @@ public class AuthController {
         return ResponseEntity.ok("OTP sent for verification");
     }
 
-    @GetMapping("/changePassword")
-    public ResponseEntity<String> resetPassword(@RequestParam("OTP") String OTP, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("confirmPassword") String ConfirmPassword) {
-        User user = userRepository.findByEmail(email);
+    @PostMapping("/changePassword")
+    public ResponseEntity<String> resetPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        User user = userRepository.findByEmail(changePasswordRequest.getEmail());
         if(user == null)    return ResponseEntity.badRequest().body("User not found");
 
-        boolean validOTP = userDetailsService.verifyOTP(OTP, user);
+        boolean validOTP = userDetailsService.verifyOTP(changePasswordRequest.getOTP(), user);
         if(!validOTP)    return ResponseEntity.badRequest().body("Invalid OTP");
 
-        if(!password.equals(ConfirmPassword))    return ResponseEntity.badRequest().body("Passwords do not match");
+        if(!changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword()))    return ResponseEntity.badRequest().body("Passwords do not match");
 
-        user.setPassword(encoder.encode(password));
+        user.setPassword(encoder.encode(changePasswordRequest.getPassword()));
         userRepository.save(user);
 
         return ResponseEntity.ok("Password changed successfully");

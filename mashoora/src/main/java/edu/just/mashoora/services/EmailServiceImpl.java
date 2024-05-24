@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class EmailVerificationServiceImpl implements EmailVerificationService{
+public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
@@ -18,7 +18,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService{
         String subject = "Mashoora Email Verification";
         String text = "Thank you for signing up with Mashoora Platform. Before we can proceed further, we kindly ask you to confirm your email address to activate your account.\n"
                 + "\n" + "Please click on the following link to confirm your email address:\n" +
-                Constants.ADEL_CHATBOT_API_URL + "?userId=" + userId + "&token=" + token;
+                Constants.MASHOORA_PROD_EMAIL_VERIFY_API_URL + "?userId=" + userId + "&token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -31,7 +31,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService{
     @Override
     public void sendChangePasswordOTP(String to, Long userId, String OTP) {
         String subject = "Mashoora Change Password OTP";
-        String text = "Your OTP is " + userId;
+        String text = "Your OTP is " + OTP;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);

@@ -31,8 +31,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
-
-
     private String generate_OTP(){
         StringBuilder sb = new StringBuilder();
         for(int i=0;i<6;i++){
@@ -42,12 +40,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public String generateChangePasswordOtp(User user) {
+        changePasswordOTPRepository.findByUser(user).ifPresent(changePasswordOTPRepository::delete);
         String otp = generate_OTP();
         ChangePasswordOTP changePasswordOTP = ChangePasswordOTP.builder()
                 .otp(otp)
-                .ExpirationTime(new Date(System.currentTimeMillis() + 70 * 1000))
+                .ExpirationTime(new Date(System.currentTimeMillis() + 120 * 1000))
                 .user(user)
                 .build();
+
         changePasswordOTPRepository.save(changePasswordOTP);
         return otp;
     }

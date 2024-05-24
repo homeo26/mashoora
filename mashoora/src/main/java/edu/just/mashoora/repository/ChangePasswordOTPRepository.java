@@ -12,5 +12,6 @@ public interface ChangePasswordOTPRepository extends JpaRepository<ChangePasswor
     @Query("select cpOtp from ChangePasswordOTP cpOtp where cpOtp.otp =?1 and cpOtp.user = ?2")
     ChangePasswordOTP findByOtpAndUser(String otp, User user);
 
-
+    @Query("select cpOtp from ChangePasswordOTP cpOtp where cpOtp.user = ?1")
+    Optional<ChangePasswordOTP> findByUser(User user);
 }

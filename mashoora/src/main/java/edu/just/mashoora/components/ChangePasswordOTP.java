@@ -14,6 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "ChangePasswordOTP")
 public class ChangePasswordOTP {
 
     @Id
