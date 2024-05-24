@@ -67,6 +67,7 @@ public class RatingService {
         Optional<LawyerStrength> lawyerStrength = lawyerStrengthRepository.findById(id);
         LawyerStrength strength = new LawyerStrength();
         strength.setId(id);
+        strength.setUser(userRepository.getReferenceById(id));
         if(lawyerStrength.isPresent()) strength  = lawyerStrength.get();
 
         switch (field) {
@@ -93,6 +94,8 @@ public class RatingService {
                 break;
             case PROCEDURAL_LAW:
                 strength.setProceduralLaw(true);
+                break;
+            default:
                 break;
         }
         lawyerStrengthRepository.save(strength);
@@ -170,6 +173,8 @@ public class RatingService {
                     .build();
 
         Rating rating = ratingRepository.findById(id).get();
+        rating.fixRatings();
+
         float rate = 0L;
         int count = 0;
         switch (field) {
@@ -205,6 +210,7 @@ public class RatingService {
                 count = rating.getProceduralCasesCounter();
                 break;
         }
+
         return LawFieldRate.builder()
                 .field(field.toString())
                 .rate(rate)
@@ -215,16 +221,22 @@ public class RatingService {
     public List<User> getFieldStrongLawyers(ELawTypes field){
         List<LawyerStrength> lawyerStrengths = new ArrayList<>();
         switch (field) {
-            case CIVIL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCivilLawTrue();
-            case COMMERCIAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCommercialLawTrue();
-            case INTERNATIONAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByInternationalLawTrue();
-            case CRIMINAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCriminalLawTrue();
-            case ADMINISTRATIVE_AND_FINANCE_LAW ->
-                    lawyerStrengths = lawyerStrengthRepository.findAllByAdministrativeAndFinancialLawTrue();
-            case CONSTITUTIONAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByConstitutionalLawTrue();
-            case PRIVATE_INTERNATIONAL_LAW ->
-                    lawyerStrengths = lawyerStrengthRepository.findAllByPrivateInternationalLawTrue();
-            case PROCEDURAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByProceduralLawTrue();
+            case CIVIL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByCivilLawTrue();
+            case COMMERCIAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByCommercialLawTrue();
+            case INTERNATIONAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByInternationalLawTrue();
+            case CRIMINAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByCriminalLawTrue();
+            case ADMINISTRATIVE_AND_FINANCE_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByAdministrativeAndFinancialLawTrue();
+            case CONSTITUTIONAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByConstitutionalLawTrue();
+            case PRIVATE_INTERNATIONAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByPrivateInternationalLawTrue();
+            case PROCEDURAL_LAW
+                    -> lawyerStrengths = lawyerStrengthRepository.findAllByProceduralLawTrue();
             default -> {
             }
         }
@@ -233,6 +245,17 @@ public class RatingService {
             lawyers.add(userRepository.getReferenceById(lawyerStrength.getId()));
         }
         return lawyers;
+    }
+
+    public List<LawFieldRate> getUserRatings(long id){
+        List<LawFieldRate> rates = new ArrayList<>();
+        Rating rating = ratingRepository.findById(id).get();
+        rating.fixRatings();
+        for(int i=0;i< Constants.LAW_FIELDS.length;i++){
+            LawFieldRate rate = getRatingDetails(id, Constants.LAW_FIELDS[i]);
+            rates.add(rate);
+        }
+        return rates;
     }
 
 }

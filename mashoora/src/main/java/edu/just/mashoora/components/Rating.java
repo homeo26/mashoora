@@ -90,4 +90,15 @@ public class Rating {
         return (float) ((fieldRating-5) / fieldCounter);
     }
 
+    public void fixRatings(){
+        civilLawRating = calculateCivilLawRating();
+        criminalLawRating = calculateCriminalLawRating();
+        commercialLawRating = calculateCommercialLawRating();
+        internationalLawRating = calculateInternationalLawRating();
+        administrativeAndFinancialLawRating = calculateAdministrativeAndFinancialLawRating();
+        constitutionalLawRating = calculateConstitutionalLawRating();
+        proceduralLawRating = calculateProceduralLawRating();
+        privateInternationalLawRating = calculatePrivateInternationalLawRating();
+    }
+
 }

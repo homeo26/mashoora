@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LawyerListingResponse {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private List<String> topLawFields;
-    private LawFieldRate lawFieldRate;
+public class LawyerInfoResponse {
+        private Long lawyerId;
+        private String firstName;
+        private String lastName;
+        private String userName;
+        private String email;
+        List<LawFieldRate> lawFieldsDetails;
 }
