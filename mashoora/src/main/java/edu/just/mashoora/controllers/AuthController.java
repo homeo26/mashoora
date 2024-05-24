@@ -19,7 +19,9 @@ import edu.just.mashoora.services.UserDetailsImpl;
 import edu.just.mashoora.services.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.Repository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -180,22 +182,25 @@ public class AuthController {
     }
 
     @PostMapping("/lawyerDetails/{id}")
-    public ResponseEntity<String> requiredLawyerInfo(@PathVariable("id") Long id,
-                                                     @RequestParam("file") MultipartFile file,
-                                                     @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
-                                                     @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
-                                                     @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
-                                                     @RequestParam(value = "criminalLaw", required = false) Integer criminalLaw,
-                                                     @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
-                                                     @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
-                                                     @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
-                                                     @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw){
+    @PreAuthorize("hasRole('LAWYER')")
+    public ResponseEntity<String> requiredLawyerDetails(@RequestParam("file") MultipartFile file,
+                                                        @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
+                                                        @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
+                                                        @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
+                                                        @RequestParam(value = "criminalLaw", required = false) Integer criminalLaw,
+                                                        @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
+                                                        @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
+                                                        @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
+                                                        @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw){
 
         if (!file.getContentType().equals("application/pdf")) {
             return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
         }
 
         try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username).get();
+            long id = user.getId();
             String fileName = id + ".pdf";
 
             Path uploadDir = Paths.get("uploads");
@@ -220,6 +225,24 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error sending request: " + e.getMessage());
         }
 
+    }
+
+    @GetMapping("/checkLawyerDetails")
+    @PreAuthorize("hasRole('LAWYER')")
+    public ResponseEntity<String> checkLawyerDetails(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).get();
+        long id = user.getId();
+        String fileName = id + ".pdf";
+
+        Path uploadDir = Paths.get("uploads");
+        if (!Files.exists(uploadDir))
+            return ResponseEntity.badRequest().body("No certificates exist");
+
+        Path filePath = Paths.get(uploadDir+"/", fileName);
+        if (!Files.exists(filePath))
+            return ResponseEntity.badRequest().body("No certificate ralated to " + username + " exist");
+        return ResponseEntity.ok("Found " + username + "\'s certificate successfully");
     }
 
     @PostMapping("/forgetPasswordEmail")
