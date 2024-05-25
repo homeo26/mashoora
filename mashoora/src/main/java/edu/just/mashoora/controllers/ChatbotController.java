@@ -6,6 +6,7 @@ import edu.just.mashoora.payload.response.ChatbotQueryResponse;
 import edu.just.mashoora.services.ChatbotServiceImpl;
 import edu.just.mashoora.services.UserDetailsImpl;
 import edu.just.mashoora.utils.StandardResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class ChatbotController {
 
     @PostMapping("/query")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
-    public ResponseEntity<StandardResponse<?>> sendQuery(@RequestBody ChatbotQueryRequest request) {
+    public ResponseEntity<StandardResponse<?>> sendQuery(@Valid @RequestBody ChatbotQueryRequest request) {
         StandardResponse<ChatbotQueryResponse> response = new StandardResponse<>();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,7 +81,7 @@ public class ChatbotController {
         response.setStatus(HttpStatus.OK.getReasonPhrase());
         response.setStatusCode(HttpStatus.OK.value());
         response.setDetailedStatusCode("History deleted successfully");
-        response.setData("Chat history with adel was deleted succesfuly");
+        response.setData("Chat history with adel was deleted successfully");
 
         return ResponseEntity.status(HttpStatus.OK.value()).body(response);
 

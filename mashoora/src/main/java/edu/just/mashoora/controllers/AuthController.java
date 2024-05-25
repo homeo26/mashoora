@@ -1,7 +1,6 @@
 package edu.just.mashoora.controllers;
 
 
-import edu.just.mashoora.constants.ELawTypes;
 import edu.just.mashoora.constants.ERole;
 import edu.just.mashoora.jwt.JwtUtils;
 import edu.just.mashoora.models.Role;
@@ -14,12 +13,10 @@ import edu.just.mashoora.payload.response.MessageResponse;
 import edu.just.mashoora.repository.RoleRepository;
 import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.EmailServiceImpl;
-import edu.just.mashoora.services.RatingService;
 import edu.just.mashoora.services.UserDetailsImpl;
 import edu.just.mashoora.services.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.Repository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,8 +25,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +68,7 @@ public class AuthController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    // TODO: Migrate the logic of all controllers to Services directory
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -97,7 +100,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 
         String username = signUpRequest.getUsername();
         String email = signUpRequest.getEmail();
@@ -181,17 +184,17 @@ public class AuthController {
 
     @GetMapping("/checkLawyerDetails")
     @PreAuthorize("hasRole('LAWYER')")
-    public ResponseEntity<String> checkLawyerDetails(){
+    public ResponseEntity<String> checkLawyerDetails() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).get();
-        long id = user.getId();
+        Long id = user.getId();
         String fileName = id + ".pdf";
 
         Path uploadDir = Paths.get("uploads");
         if (!Files.exists(uploadDir))
             return ResponseEntity.badRequest().body("No certificates exist");
 
-        Path filePath = Paths.get(uploadDir+"/", fileName);
+        Path filePath = Paths.get(uploadDir + "/", fileName);
         if (!Files.exists(filePath))
             return ResponseEntity.badRequest().body("No certificate ralated to " + username + " exist");
         return ResponseEntity.ok("Found " + username + "\'s certificate successfully");
@@ -200,7 +203,7 @@ public class AuthController {
     @PostMapping("/forgetPasswordEmail")
     public ResponseEntity<String> forgetPassword(@RequestParam("email") String email) {
         User user = userRepository.findByEmail(email);
-        if(user == null)    return ResponseEntity.badRequest().body("User not found");
+        if (user == null) return ResponseEntity.badRequest().body("User not found");
 
         String otp = userDetailsService.generateChangePasswordOtp(user);
         emailService.sendChangePasswordOTP(user.getEmail(), user.getId(), otp);
@@ -209,14 +212,15 @@ public class AuthController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<String> resetPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         User user = userRepository.findByEmail(changePasswordRequest.getEmail());
-        if(user == null)    return ResponseEntity.badRequest().body("User not found");
+        if (user == null) return ResponseEntity.badRequest().body("User not found");
 
         boolean validOTP = userDetailsService.verifyOTP(changePasswordRequest.getOTP(), user);
-        if(!validOTP)    return ResponseEntity.badRequest().body("Invalid OTP");
+        if (!validOTP) return ResponseEntity.badRequest().body("Invalid OTP");
 
-        if(!changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword()))    return ResponseEntity.badRequest().body("Passwords do not match");
+        if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword()))
+            return ResponseEntity.badRequest().body("Passwords do not match");
 
         user.setPassword(encoder.encode(changePasswordRequest.getPassword()));
         userRepository.save(user);
@@ -241,7 +245,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Invalid verification token");
         }
     }
-
 
 
 }

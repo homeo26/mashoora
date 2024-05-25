@@ -44,7 +44,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String otp = generate_OTP();
         ChangePasswordOTP changePasswordOTP = ChangePasswordOTP.builder()
                 .otp(otp)
-                .ExpirationTime(new Date(System.currentTimeMillis() + 120 * 1000))
+                .expirationTime(new Date(System.currentTimeMillis() + 120 * 1000))
                 .user(user)
                 .build();
 

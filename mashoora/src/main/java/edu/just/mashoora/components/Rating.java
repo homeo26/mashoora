@@ -3,8 +3,8 @@ package edu.just.mashoora.components;
 import edu.just.mashoora.models.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -63,34 +63,42 @@ public class Rating {
     public float calculateAdministrativeAndFinancialLawRating() {
         return calculateFieldRating(administrativeAndFinancialLawRating, administrativeAndFinancialCasesCounter);
     }
+
     public float calculateConstitutionalLawRating() {
-       return calculateFieldRating(constitutionalLawRating, constitutionalCasesCounter);
+        return calculateFieldRating(constitutionalLawRating, constitutionalCasesCounter);
     }
+
     public float calculateCivilLawRating() {
         return calculateFieldRating(civilLawRating, civilCasesCounter);
     }
+
     public float calculateCommercialLawRating() {
         return calculateFieldRating(commercialLawRating, commercialCasesCounter);
     }
+
     public float calculateInternationalLawRating() {
         return calculateFieldRating(internationalLawRating, internationalCasesCounter);
     }
+
     public float calculateCriminalLawRating() {
         return calculateFieldRating(criminalLawRating, criminalCasesCounter);
     }
+
     public float calculateProceduralLawRating() {
         return calculateFieldRating(proceduralLawRating, proceduralCasesCounter);
     }
+
     public float calculatePrivateInternationalLawRating() {
         return calculateFieldRating(privateInternationalLawRating, privateInternationalCasesCounter);
     }
-    private float calculateFieldRating(float fieldRating, int fieldCounter){
-        if(fieldCounter == 0)
+
+    private float calculateFieldRating(float fieldRating, int fieldCounter) {
+        if (fieldCounter == 0)
             return fieldRating;
-        return (float) ((fieldRating-5) / fieldCounter);
+        return (fieldRating - 5) / fieldCounter;
     }
 
-    public void fixRatings(){
+    public void fixRatings() {
         civilLawRating = calculateCivilLawRating();
         criminalLawRating = calculateCriminalLawRating();
         commercialLawRating = calculateCommercialLawRating();

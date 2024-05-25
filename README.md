@@ -46,5 +46,13 @@ In able to run the application fully, These are the prerequisites:
    pip install google-generativeai
    pip install flask flask-sqlalchemy
    ```
+   > **Note**: in order to be able to `pip install google-generativeai` and `pip install flask flask-sqlalchemy` it is highly recommended to install those libraries in a virtual python enviroment.
+   > 
+   > Take a look on the following link:
+   > **[Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)**
 
-7. Run the python Flask app.
+7. Run the python Flask app by running the following command.
+   ```bash
+   # cd into the directory of the AdelChatbot.py file and python3 it
+   python3 mashoora/src/main/python/AdelChatbot.py
+   ```

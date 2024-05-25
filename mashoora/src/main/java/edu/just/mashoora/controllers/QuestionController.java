@@ -1,7 +1,5 @@
 package edu.just.mashoora.controllers;
 
-import edu.just.mashoora.components.Comment;
-import edu.just.mashoora.components.Question;
 import edu.just.mashoora.payload.request.QuestionRequest;
 import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.payload.response.QuestionResponse;
@@ -22,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/questions")

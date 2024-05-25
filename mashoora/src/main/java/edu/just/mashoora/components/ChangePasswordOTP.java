@@ -1,11 +1,18 @@
 package edu.just.mashoora.components;
 
 import edu.just.mashoora.models.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -17,23 +24,18 @@ import java.util.Date;
 @Table(name = "ChangePasswordOTP")
 public class ChangePasswordOTP {
 
+    @Getter
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String otp;
 
     @Column(nullable = false)
-    private Date ExpirationTime;
+    private Date expirationTime;
     @OneToOne
     private User user;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 }

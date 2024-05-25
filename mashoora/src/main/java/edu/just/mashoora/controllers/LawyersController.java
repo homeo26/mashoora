@@ -6,12 +6,17 @@ import edu.just.mashoora.models.User;
 import edu.just.mashoora.payload.response.LawyerInfoResponse;
 import edu.just.mashoora.payload.response.LawyerListingResponse;
 import edu.just.mashoora.repository.UserRepository;
-import edu.just.mashoora.services.RatingService;
+import edu.just.mashoora.services.RatingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -24,26 +29,26 @@ import java.util.List;
 @RequestMapping("/api/lawyers")
 public class LawyersController {
 
-    private final RatingService ratingService;
+    private final RatingServiceImpl ratingServiceImpl;
     private final UserRepository userRepository;
 
     @Autowired
-    public LawyersController(RatingService ratingService, UserRepository userRepository) {
-        this.ratingService = ratingService;
+    public LawyersController(RatingServiceImpl ratingServiceImpl, UserRepository userRepository) {
+        this.ratingServiceImpl = ratingServiceImpl;
         this.userRepository = userRepository;
     }
 
     @GetMapping("/list/{field}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
-    public ResponseEntity<List<LawyerListingResponse>> fieldLawyerListing(@PathVariable("field") ELawTypes field){
-        List<User> fieldLawyers = ratingService.getFieldStrongLawyers(field);
+    public ResponseEntity<List<LawyerListingResponse>> fieldLawyerListing(@PathVariable("field") ELawTypes field) {
+        List<User> fieldLawyers = ratingServiceImpl.getFieldStrongLawyers(field);
         List<LawyerListingResponse> lawyerListingNodes = new ArrayList<>();
-        for(User lawyer : fieldLawyers) {
-            long id = lawyer.getId();
+        for (User lawyer : fieldLawyers) {
+            Long id = lawyer.getId();
             String firstName = lawyer.getFirstName();
             String lastName = lawyer.getLastName();
-            List<String> lawyerFields = ratingService.getTopRatingFields(lawyer.getId());
-            LawFieldRate lawFieldRate = ratingService.getRatingDetails(lawyer.getId(), field);
+            List<String> lawyerFields = ratingServiceImpl.getTopRatingFields(lawyer.getId());
+            LawFieldRate lawFieldRate = ratingServiceImpl.getRatingDetails(lawyer.getId(), field);
             LawyerListingResponse lawyerListingResponse
                     = LawyerListingResponse.builder()
                     .id(id)
@@ -60,15 +65,15 @@ public class LawyersController {
 
     @GetMapping("/LawyerInfo/{id}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
-    public ResponseEntity<LawyerInfoResponse> LawyerInfo(@PathVariable ("id") long id){
-        LawyerInfoResponse  lawyerInfoResponse = new LawyerInfoResponse();
+    public ResponseEntity<LawyerInfoResponse> LawyerInfo(@PathVariable("id") Long id) {
+        LawyerInfoResponse lawyerInfoResponse = new LawyerInfoResponse();
         User lawyer = userRepository.findById(id).get();
         lawyerInfoResponse.setLawyerId(id);
         lawyerInfoResponse.setUserName(lawyer.getUsername());
         lawyerInfoResponse.setFirstName(lawyer.getFirstName());
         lawyerInfoResponse.setLastName(lawyer.getLastName());
         lawyerInfoResponse.setEmail(lawyer.getEmail());
-        lawyerInfoResponse.setLawFieldsDetails(ratingService.getUserRatings(id));
+        lawyerInfoResponse.setLawFieldsDetails(ratingServiceImpl.getUserRatings(id));
 
         return ResponseEntity.ok(lawyerInfoResponse);
     }
@@ -84,7 +89,7 @@ public class LawyersController {
                                                         @RequestParam(value = "administrativeAndFinancialLaw", required = false) Boolean administrativeAndFinancialLaw,
                                                         @RequestParam(value = "constitutionalLaw", required = false) Boolean constitutionalLaw,
                                                         @RequestParam(value = "privateInternationalLaw", required = false) Boolean privateInternationalLaw,
-                                                        @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw){
+                                                        @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw) {
 
         if (!file.getContentType().equals("application/pdf")) {
             return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
@@ -93,22 +98,22 @@ public class LawyersController {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             User user = userRepository.findByUsername(username).get();
-            long id = user.getId();
+            Long id = user.getId();
             String fileName = id + ".pdf";
 
             Path uploadDir = Paths.get("uploads");
             if (!Files.exists(uploadDir))
                 Files.createDirectories(uploadDir);
 
-            Path filePath = Paths.get(uploadDir+"/", fileName);
+            Path filePath = Paths.get(uploadDir + "/", fileName);
 
             Files.write(filePath, file.getBytes());
 
-            ratingService.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
+            ratingServiceImpl.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
                     administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
 
             return ResponseEntity.ok("Lawyer Profile Completed");
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error sending request: " + e.getMessage());
         }
 
@@ -122,11 +127,11 @@ public class LawyersController {
                                                        @RequestParam(value = "administrativeAndFinancialLaw", required = false) Boolean administrativeAndFinancialLaw,
                                                        @RequestParam(value = "constitutionalLaw", required = false) Boolean constitutionalLaw,
                                                        @RequestParam(value = "privateInternationalLaw", required = false) Boolean privateInternationalLaw,
-                                                       @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw){
+                                                       @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).get();
-        long id = user.getId();
-        ratingService.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
+        Long id = user.getId();
+        ratingServiceImpl.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
                 administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
         return ResponseEntity.ok("Law Fields Speciality Updated");
     }
