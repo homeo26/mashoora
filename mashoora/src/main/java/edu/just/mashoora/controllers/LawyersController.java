@@ -10,8 +10,13 @@ import edu.just.mashoora.services.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +62,6 @@ public class LawyersController {
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
     public ResponseEntity<LawyerInfoResponse> LawyerInfo(@PathVariable ("id") long id){
         LawyerInfoResponse  lawyerInfoResponse = new LawyerInfoResponse();
-        // ToDo: prepare the response
         User lawyer = userRepository.findById(id).get();
         lawyerInfoResponse.setLawyerId(id);
         lawyerInfoResponse.setUserName(lawyer.getUsername());
@@ -68,4 +72,63 @@ public class LawyersController {
 
         return ResponseEntity.ok(lawyerInfoResponse);
     }
+
+
+    @PostMapping("/lawyerDetails")
+    @PreAuthorize("hasRole('LAWYER')")
+    public ResponseEntity<String> requiredLawyerDetails(@RequestParam("file") MultipartFile file,
+                                                        @RequestParam(value = "civilLaw", required = false) Boolean civilLaw,
+                                                        @RequestParam(value = "commercialLaw", required = false) Boolean commercialLaw,
+                                                        @RequestParam(value = "internationalLaw", required = false) Boolean internationalLaw,
+                                                        @RequestParam(value = "criminalLaw", required = false) Boolean criminalLaw,
+                                                        @RequestParam(value = "administrativeAndFinancialLaw", required = false) Boolean administrativeAndFinancialLaw,
+                                                        @RequestParam(value = "constitutionalLaw", required = false) Boolean constitutionalLaw,
+                                                        @RequestParam(value = "privateInternationalLaw", required = false) Boolean privateInternationalLaw,
+                                                        @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw){
+
+        if (!file.getContentType().equals("application/pdf")) {
+            return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
+        }
+
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username).get();
+            long id = user.getId();
+            String fileName = id + ".pdf";
+
+            Path uploadDir = Paths.get("uploads");
+            if (!Files.exists(uploadDir))
+                Files.createDirectories(uploadDir);
+
+            Path filePath = Paths.get(uploadDir+"/", fileName);
+
+            Files.write(filePath, file.getBytes());
+
+            ratingService.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
+                    administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
+
+            return ResponseEntity.ok("Lawyer Profile Completed");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Error sending request: " + e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/updateLawyerStrength")
+    public ResponseEntity<String> updateLawyerStrength(@RequestParam(value = "civilLaw", required = false) Boolean civilLaw,
+                                                       @RequestParam(value = "commercialLaw", required = false) Boolean commercialLaw,
+                                                       @RequestParam(value = "internationalLaw", required = false) Boolean internationalLaw,
+                                                       @RequestParam(value = "criminalLaw", required = false) Boolean criminalLaw,
+                                                       @RequestParam(value = "administrativeAndFinancialLaw", required = false) Boolean administrativeAndFinancialLaw,
+                                                       @RequestParam(value = "constitutionalLaw", required = false) Boolean constitutionalLaw,
+                                                       @RequestParam(value = "privateInternationalLaw", required = false) Boolean privateInternationalLaw,
+                                                       @RequestParam(value = "proceduralLaw", required = false) Boolean proceduralLaw){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).get();
+        long id = user.getId();
+        ratingService.updateLawyerStrength(id, civilLaw, commercialLaw, internationalLaw, criminalLaw,
+                administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
+        return ResponseEntity.ok("Law Fields Speciality Updated");
+    }
+
 }

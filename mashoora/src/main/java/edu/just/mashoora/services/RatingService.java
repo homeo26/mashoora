@@ -12,7 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import edu.just.mashoora.constants.ELawTypes;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,11 +62,10 @@ public class RatingService {
                 rating.setProceduralLawRating(rating.getProceduralLawRating()+rate);
                 break;
         }
-        setLawyerStrength(id, field);
         ratingRepository.save(rating);
     }
 
-    public void setLawyerStrength(long id, ELawTypes field) {
+    public void setLawyerStrength(long id, ELawTypes field, boolean value) {
         Optional<LawyerStrength> lawyerStrength = lawyerStrengthRepository.findById(id);
         LawyerStrength strength = new LawyerStrength();
         strength.setId(id);
@@ -72,28 +74,28 @@ public class RatingService {
 
         switch (field) {
             case CIVIL_LAW:
-                strength.setCivilLaw(true);
+                strength.setCivilLaw(value);
                 break;
             case COMMERCIAL_LAW:
-                strength.setCommercialLaw(true);
+                strength.setCommercialLaw(value);
                 break;
             case INTERNATIONAL_LAW:
-                strength.setInternationalLaw(true);
+                strength.setInternationalLaw(value);
                 break;
             case CRIMINAL_LAW:
-                strength.setCriminalLaw(true);
+                strength.setCriminalLaw(value);
                 break;
             case ADMINISTRATIVE_AND_FINANCE_LAW:
-                strength.setAdministrativeAndFinancialLaw(true);
+                strength.setAdministrativeAndFinancialLaw(value);
                 break;
             case CONSTITUTIONAL_LAW:
-                strength.setConstitutionalLaw(true);
+                strength.setConstitutionalLaw(value);
                 break;
             case PRIVATE_INTERNATIONAL_LAW:
-                strength.setPrivateInternationalLaw(true);
+                strength.setPrivateInternationalLaw(value);
                 break;
             case PROCEDURAL_LAW:
-                strength.setProceduralLaw(true);
+                strength.setProceduralLaw(value);
                 break;
             default:
                 break;
@@ -143,7 +145,10 @@ public class RatingService {
         return rating;
     }
 
-    public ArrayList<ELawTypes> selectedAttributes(Integer civilLaw, Integer commercialLaw, Integer internationalLaw, Integer criminalLaw, Integer administrativeAndFinancialLaw, Integer constitutionalLaw, Integer privateInternationalLaw, Integer proceduralLaw){
+    public ArrayList<ELawTypes> selectedAttributes(Boolean civilLaw, Boolean commercialLaw,
+                                                   Boolean internationalLaw, Boolean criminalLaw,
+                                                   Boolean administrativeAndFinancialLaw, Boolean constitutionalLaw,
+                                                   Boolean privateInternationalLaw, Boolean proceduralLaw){
         ArrayList<ELawTypes> fields = new ArrayList<>();
         if (civilLaw != null) fields.add(ELawTypes.CIVIL_LAW);
         if (commercialLaw != null) fields.add(ELawTypes.COMMERCIAL_LAW);
@@ -258,4 +263,26 @@ public class RatingService {
         return rates;
     }
 
+    public void resetLawyerStrength(long id) {
+        for (ELawTypes field : Constants.LAW_FIELDS) {
+            setLawyerStrength(id, field, false);
+        }
+
+    }
+
+    public void updateLawyerStrength (long id, Boolean civilLaw, Boolean commercialLaw,
+                                      Boolean internationalLaw, Boolean criminalLaw, Boolean administrativeAndFinancialLaw,
+                                      Boolean constitutionalLaw, Boolean privateInternationalLaw, Boolean proceduralLaw){
+        List<ELawTypes> fields = selectedAttributes(civilLaw, commercialLaw,
+                internationalLaw, criminalLaw, administrativeAndFinancialLaw,
+                constitutionalLaw, privateInternationalLaw, proceduralLaw);
+
+        resetLawyerStrength(id);
+        if (!fields.isEmpty()) {
+            for (ELawTypes field : fields) {
+                setLawyerStrength(id, field,true);
+            }
+        }
+    }
 }
+

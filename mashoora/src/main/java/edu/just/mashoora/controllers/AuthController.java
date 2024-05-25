@@ -55,9 +55,6 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
-    private RatingService ratingService;
-
-    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
@@ -180,52 +177,7 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email for verification."));
     }
-
-    @PostMapping("/lawyerDetails/{id}")
-    @PreAuthorize("hasRole('LAWYER')")
-    public ResponseEntity<String> requiredLawyerDetails(@RequestParam("file") MultipartFile file,
-                                                        @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
-                                                        @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
-                                                        @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
-                                                        @RequestParam(value = "criminalLaw", required = false) Integer criminalLaw,
-                                                        @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
-                                                        @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
-                                                        @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
-                                                        @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw){
-
-        if (!file.getContentType().equals("application/pdf")) {
-            return ResponseEntity.badRequest().body("Invalid file type. Please upload a PDF file.");
-        }
-
-        try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userRepository.findByUsername(username).get();
-            long id = user.getId();
-            String fileName = id + ".pdf";
-
-            Path uploadDir = Paths.get("uploads");
-            if (!Files.exists(uploadDir))
-                Files.createDirectories(uploadDir);
-
-            Path filePath = Paths.get(uploadDir+"/", fileName);
-
-            Files.write(filePath, file.getBytes());
-            List<ELawTypes> fields = ratingService.selectedAttributes(civilLaw, commercialLaw,
-                    internationalLaw, criminalLaw, administrativeAndFinancialLaw,
-                    constitutionalLaw, privateInternationalLaw, proceduralLaw);
-
-            if (!fields.isEmpty()) {
-                for (ELawTypes field : fields) {
-                    ratingService.saveRating(id, field, 5);
-                }
-            }
-
-            return ResponseEntity.ok("request sent successfully");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body("Error sending request: " + e.getMessage());
-        }
-
-    }
+    // <YOUR_GithubPersonalAccessToken_HERE
 
     @GetMapping("/checkLawyerDetails")
     @PreAuthorize("hasRole('LAWYER')")
