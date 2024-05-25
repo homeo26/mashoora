@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class LawyerListingResponse {
     private Long id;
+    private String userName;
     private String firstName;
     private String lastName;
     private List<String> topLawFields;

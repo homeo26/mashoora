@@ -47,11 +47,13 @@ public class LawyersController {
             Long id = lawyer.getId();
             String firstName = lawyer.getFirstName();
             String lastName = lawyer.getLastName();
+            String userName = lawyer.getUsername();
             List<String> lawyerFields = ratingServiceImpl.getTopRatingFields(lawyer.getId());
             LawFieldRate lawFieldRate = ratingServiceImpl.getRatingDetails(lawyer.getId(), field);
             LawyerListingResponse lawyerListingResponse
                     = LawyerListingResponse.builder()
                     .id(id)
+                    .userName(userName)
                     .firstName(firstName)
                     .lastName(lastName)
                     .topLawFields(lawyerFields)

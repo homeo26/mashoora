@@ -175,7 +175,7 @@ public class RatingServiceImpl implements RatingService {
     public LawFieldRate getRatingDetails(Long id, ELawTypes field) {
         if (!ratingRepository.existsById(id))
             return LawFieldRate.builder()
-                    .field("")
+                    .field(field.toString())
                     .rate(0L)
                     .Count(0)
                     .build();
@@ -251,8 +251,6 @@ public class RatingServiceImpl implements RatingService {
 
     public List<LawFieldRate> getUserRatings(Long id) {
         List<LawFieldRate> rates = new ArrayList<>();
-        Rating rating = ratingRepository.findById(id).get();
-        rating.fixRatings();
         for (int i = 0; i < Constants.LAW_FIELDS.length; i++) {
             LawFieldRate rate = getRatingDetails(id, Constants.LAW_FIELDS[i]);
             rates.add(rate);
