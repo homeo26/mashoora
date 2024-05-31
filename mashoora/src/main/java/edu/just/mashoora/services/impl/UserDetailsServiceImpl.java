@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.ChangePasswordOTP;
 import edu.just.mashoora.models.User;
@@ -31,10 +31,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
-    private String generate_OTP(){
+    private String generate_OTP() {
         StringBuilder sb = new StringBuilder();
-        for(int i=0;i<6;i++){
-            sb.append((int)(Math.random()*10));
+        for (int i = 0; i < 6; i++) {
+            sb.append((int) (Math.random() * 10));
         }
         return sb.toString();
     }
@@ -54,9 +54,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean verifyOTP(String otp, User user) {
         ChangePasswordOTP changePasswordOTP = changePasswordOTPRepository.findByOtpAndUser(otp, user);
-        if(changePasswordOTP == null)   return false;
+        if (changePasswordOTP == null) return false;
         Date currentTime = new Date();
-        if(currentTime.after(changePasswordOTP.getExpirationTime())) return false;
+        if (currentTime.after(changePasswordOTP.getExpirationTime())) return false;
 
         changePasswordOTPRepository.delete(changePasswordOTP);
         return true;

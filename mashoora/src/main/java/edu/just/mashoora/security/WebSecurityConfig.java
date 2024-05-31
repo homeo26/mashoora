@@ -2,7 +2,7 @@ package edu.just.mashoora.security;
 
 import edu.just.mashoora.jwt.AuthEntryPointJwt;
 import edu.just.mashoora.jwt.AuthTokenFilter;
-import edu.just.mashoora.services.UserDetailsServiceImpl;
+import edu.just.mashoora.services.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

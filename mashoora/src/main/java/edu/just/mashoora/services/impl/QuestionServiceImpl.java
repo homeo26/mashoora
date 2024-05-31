@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.components.Question;
@@ -9,6 +9,7 @@ import edu.just.mashoora.payload.response.QuestionResponse;
 import edu.just.mashoora.repository.CommentRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
+import edu.just.mashoora.services.QuestionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -62,6 +63,8 @@ public class QuestionServiceImpl implements QuestionService {
                 .timestamp(savedQuestion.getTimestamp())
                 .userId(savedQuestion.getUser().getId())
                 .username(savedQuestion.getUser().getUsername())
+                .firstName(savedQuestion.getUser().getFirstName())
+                .lastName(savedQuestion.getUser().getLastName())
                 .build();
     }
 
@@ -79,7 +82,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
     }
-
+    @Override
     public Page<QuestionResponse> getQuestionsByPage(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         Page<Question> questionPage = questionRepository.findAllByOrderByTimestampDesc(pageable);

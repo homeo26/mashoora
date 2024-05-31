@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.Comment;
 import edu.just.mashoora.components.Question;
@@ -8,6 +8,7 @@ import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.repository.CommentRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
+import edu.just.mashoora.services.CommentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package edu.just.mashoora.controllers;
 import edu.just.mashoora.payload.request.QuestionRequest;
 import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.payload.response.QuestionResponse;
-import edu.just.mashoora.services.QuestionServiceImpl;
+import edu.just.mashoora.services.QuestionService;
 import edu.just.mashoora.utils.StandardResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.List;
 public class QuestionController {
 
     @Autowired
-    private QuestionServiceImpl questionService;
+    private QuestionService questionService;
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")

@@ -2,7 +2,8 @@ package edu.just.mashoora.controllers;
 
 import edu.just.mashoora.payload.request.CommentRequest;
 import edu.just.mashoora.payload.response.CommentResponse;
-import edu.just.mashoora.services.CommentServiceImpl;
+import edu.just.mashoora.services.CommentService;
+import edu.just.mashoora.services.impl.CommentServiceImpl;
 import edu.just.mashoora.utils.StandardResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
     @Autowired
-    private CommentServiceImpl commentService;
+    private CommentService commentService;
 
     @PostMapping("/{questionId}")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")

@@ -1,6 +1,6 @@
 package edu.just.mashoora.jwt;
 
-import edu.just.mashoora.services.UserDetailsServiceImpl;
+import edu.just.mashoora.services.impl.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

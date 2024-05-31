@@ -12,9 +12,9 @@ import edu.just.mashoora.payload.response.JwtResponse;
 import edu.just.mashoora.payload.response.MessageResponse;
 import edu.just.mashoora.repository.RoleRepository;
 import edu.just.mashoora.repository.UserRepository;
-import edu.just.mashoora.services.EmailServiceImpl;
-import edu.just.mashoora.services.UserDetailsImpl;
-import edu.just.mashoora.services.UserDetailsServiceImpl;
+import edu.just.mashoora.services.impl.EmailServiceImpl;
+import edu.just.mashoora.services.impl.UserDetailsImpl;
+import edu.just.mashoora.services.impl.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -123,7 +123,7 @@ public class AuthController {
         existingUser = userRepository.findByEmailAndEnabledFalse(email);
         if (existingUser != null) {
             // Delete any unverified accounts with the same email
-            userRepository.deleteByEmailAndEnabledFalse(email);
+            userRepository.deleteByEmail(email);
         }
 
         // Create new user's account

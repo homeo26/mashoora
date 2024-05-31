@@ -1,7 +1,11 @@
 package edu.just.mashoora.jwt;
 
-import edu.just.mashoora.services.UserDetailsImpl;
-import io.jsonwebtoken.*;
+import edu.just.mashoora.services.impl.UserDetailsImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;

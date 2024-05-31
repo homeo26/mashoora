@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.chatbot.AdelRequestBody;
 import edu.just.mashoora.chatbot.ChatbotMessage;
@@ -7,6 +7,7 @@ import edu.just.mashoora.constants.Constants;
 import edu.just.mashoora.payload.request.ChatbotQueryRequest;
 import edu.just.mashoora.payload.response.ChatbotQueryResponse;
 import edu.just.mashoora.repository.ChatbotRepository;
+import edu.just.mashoora.services.ChatbotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

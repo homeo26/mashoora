@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.LawFieldRate;
 import edu.just.mashoora.components.LawyerStrength;
@@ -9,6 +9,7 @@ import edu.just.mashoora.models.User;
 import edu.just.mashoora.repository.LawyerStrengthRepository;
 import edu.just.mashoora.repository.RatingRepository;
 import edu.just.mashoora.repository.UserRepository;
+import edu.just.mashoora.services.RatingService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

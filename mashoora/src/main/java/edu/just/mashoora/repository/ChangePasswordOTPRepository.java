@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface ChangePasswordOTPRepository extends JpaRepository<ChangePasswordOTP,Long> {
+public interface ChangePasswordOTPRepository extends JpaRepository<ChangePasswordOTP, Long> {
 
     @Query("select cpOtp from ChangePasswordOTP cpOtp where cpOtp.otp =?1 and cpOtp.user = ?2")
     ChangePasswordOTP findByOtpAndUser(String otp, User user);

@@ -1,4 +1,4 @@
-package edu.just.mashoora.services;
+package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.constants.Constants;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,8 +3,8 @@ package edu.just.mashoora.controllers;
 import edu.just.mashoora.chatbot.ChatbotMessage;
 import edu.just.mashoora.payload.request.ChatbotQueryRequest;
 import edu.just.mashoora.payload.response.ChatbotQueryResponse;
-import edu.just.mashoora.services.ChatbotServiceImpl;
-import edu.just.mashoora.services.UserDetailsImpl;
+import edu.just.mashoora.services.ChatbotService;
+import edu.just.mashoora.services.impl.UserDetailsImpl;
 import edu.just.mashoora.utils.StandardResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import java.util.List;
 public class ChatbotController {
 
     @Autowired
-    private ChatbotServiceImpl chatbotService;
+    private ChatbotService chatbotService;
 
     @PostMapping("/query")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")

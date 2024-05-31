@@ -13,10 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class LawyerInfoResponse {
-        private Long lawyerId;
-        private String firstName;
-        private String lastName;
-        private String userName;
-        private String email;
-        List<LawFieldRate> lawFieldsDetails;
+    private Long lawyerId;
+    private String firstName;
+    private String lastName;
+    private String userName;
+    private String email;
+    List<LawFieldRate> lawFieldsDetails;
 }
