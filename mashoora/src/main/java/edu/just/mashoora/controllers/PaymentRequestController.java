@@ -5,7 +5,9 @@ import edu.just.mashoora.constants.PaymentStatus;
 import edu.just.mashoora.payload.request.PaymentDepositRequest;
 import edu.just.mashoora.payload.request.PaymentRequestRequest;
 import edu.just.mashoora.payload.response.PaymentRequestResponse;
+import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.PaymentRequestService;
+import edu.just.mashoora.services.impl.UserDetailsServiceImpl;
 import edu.just.mashoora.utils.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -27,6 +30,10 @@ public class PaymentRequestController {
 
     @Autowired
     private PaymentRequestService paymentRequestService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
@@ -191,6 +198,27 @@ public class PaymentRequestController {
                     .status("error")
                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .detailedStatusCode("Failed to fetch declined payment requests")
+                    .data(null)
+                    .build();
+        }
+    }
+
+    @GetMapping("/balance")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('LAWYER')")
+    public StandardResponse<BigDecimal> getUserBalanceByUsername(Principal principal) {
+        try {
+            BigDecimal userBalance = userDetailsServiceImpl.getBalanceByUsername(principal.getName());
+            return StandardResponse.<BigDecimal>builder()
+                    .status("success")
+                    .statusCode(HttpStatus.OK.value())
+                    .detailedStatusCode("balance fetched successfully")
+                    .data(userBalance)
+                    .build();
+        } catch (Exception e) {
+            return StandardResponse.<BigDecimal>builder()
+                    .status("error")
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .detailedStatusCode("Failed to fetch user balance")
                     .data(null)
                     .build();
         }
