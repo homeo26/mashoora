@@ -1,6 +1,7 @@
-package edu.just.mashoora.payload.response;
+package edu.just.mashoora.payload.request;
 
-import edu.just.mashoora.constants.PaymentStatus;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +13,13 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentRequestResponse {
-
-    private Long id;
+public class PaymentDepositRequest {
 
     private String body;
 
+    @NotNull
+    @PositiveOrZero
     private BigDecimal amount;
 
-    private String customerUsername;
-
-    private PaymentStatus status;
+    private String lawyerUsername;
 }

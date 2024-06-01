@@ -2,6 +2,7 @@ package edu.just.mashoora.controllers;
 
 
 import edu.just.mashoora.constants.PaymentStatus;
+import edu.just.mashoora.payload.request.PaymentDepositRequest;
 import edu.just.mashoora.payload.request.PaymentRequestRequest;
 import edu.just.mashoora.payload.response.PaymentRequestResponse;
 import edu.just.mashoora.services.PaymentRequestService;
@@ -195,4 +196,31 @@ public class PaymentRequestController {
         }
     }
 
+    @PostMapping("/deposit")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public StandardResponse<String> depositBalanceToLawyer(@RequestBody PaymentDepositRequest paymentDepositRequest, Principal principal) {
+        try {
+            paymentRequestService.depositBalanceToLawyer(principal.getName(), paymentDepositRequest.getLawyerUsername(), paymentDepositRequest.getAmount());
+            return StandardResponse.<String>builder()
+                    .status("success")
+                    .statusCode(HttpStatus.OK.value())
+                    .detailedStatusCode("Deposited amount " + paymentDepositRequest.getAmount() + " successfully to " + paymentDepositRequest.getLawyerUsername())
+                    .data(null)
+                    .build();
+        } catch (IllegalAccessException e) {
+            return StandardResponse.<String>builder()
+                    .status("Insufficient Balance")
+                    .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
+                    .detailedStatusCode("Failed to deposit payment request due to insufficient balance")
+                    .data(null)
+                    .build();
+        } catch (Exception e) {
+            return StandardResponse.<String>builder()
+                    .status("error")
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .detailedStatusCode("Failed to deposit amount to lawyer for unknown reason")
+                    .data(null)
+                    .build();
+        }
+    }
 }

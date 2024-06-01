@@ -27,14 +27,11 @@ public class PaymentRequestServiceImpl implements PaymentRequestService {
 
     public PaymentRequestResponse createPaymentRequest(PaymentRequestRequest paymentRequestRequest, String customerUsername) {
         User customer = userRepository.findByUsername(customerUsername).orElseThrow(() -> new RuntimeException("Customer not found"));
-        User lawyer = userRepository.findByUsername(paymentRequestRequest.getLawyerUsername()).orElseThrow(() -> new RuntimeException("Lawyer not found"));
 
         PaymentRequest paymentRequest = PaymentRequest.builder()
-                .title(paymentRequestRequest.getTitle())
                 .body(paymentRequestRequest.getBody())
                 .amount(paymentRequestRequest.getAmount())
                 .customer(customer)
-                .lawyer(lawyer)
                 .status(PaymentStatus.PENDING)
                 .build();
 
@@ -59,8 +56,8 @@ public class PaymentRequestServiceImpl implements PaymentRequestService {
         PaymentRequest updatedRequest = paymentRequestRepository.save(paymentRequest);
 
         if (status == PaymentStatus.APPROVED) {
-            User lawyer = userRepository.findByUsername(updatedRequest.getLawyer().getUsername()).orElseThrow(() -> new RuntimeException("Lawyer not found"));
-            updateLawyerBalance(lawyer, updatedRequest.getAmount());
+            User customer = userRepository.findByUsername(updatedRequest.getCustomer().getUsername()).orElseThrow(() -> new RuntimeException("Customer not found"));
+            addUpUserBalance(customer, updatedRequest.getAmount());
         }
 
         return toResponsePayload(updatedRequest);
@@ -75,17 +72,34 @@ public class PaymentRequestServiceImpl implements PaymentRequestService {
     private PaymentRequestResponse toResponsePayload(PaymentRequest paymentRequest) {
         return PaymentRequestResponse.builder()
                 .id(paymentRequest.getId())
-                .title(paymentRequest.getTitle())
                 .body(paymentRequest.getBody())
                 .amount(paymentRequest.getAmount())
                 .customerUsername(paymentRequest.getCustomer().getUsername())
-                .lawyerUsername(paymentRequest.getLawyer().getUsername())
                 .status(paymentRequest.getStatus())
                 .build();
     }
 
-    private void updateLawyerBalance(User lawyer, BigDecimal amount) {
-        lawyer.setBalance(lawyer.getBalance().add(amount));
-        userRepository.save(lawyer);
+    public void addUpUserBalance(User user, BigDecimal amount) {
+        user.setBalance(user.getBalance().add(amount));
+        userRepository.save(user);
+    }
+
+    public void subtractUserBalance(User user, BigDecimal amount) throws IllegalAccessException {
+
+        if (user.getBalance().compareTo(amount) >= 0) {
+            user.setBalance(user.getBalance().subtract(amount));
+            userRepository.save(user);
+        } else {
+            throw new IllegalAccessException("The user's balance is not sufficient to cover the amount.");
+        }
+    }
+
+    public void depositBalanceToLawyer(String customerUsername, String lawyerUsername, BigDecimal amount) throws IllegalAccessException {
+
+        User customer = userRepository.findByUsername(customerUsername).orElseThrow(() -> new RuntimeException("Customer not found"));
+        User lawyer = userRepository.findByUsername(lawyerUsername).orElseThrow(() -> new RuntimeException("Lawyer not found"));
+
+        subtractUserBalance(customer, amount);
+        addUpUserBalance(lawyer, amount);
     }
 }

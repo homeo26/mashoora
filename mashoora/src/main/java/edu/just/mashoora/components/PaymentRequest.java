@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -33,9 +32,6 @@ public class PaymentRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
-
     private String body;
 
     @NotNull
@@ -49,7 +45,4 @@ public class PaymentRequest {
     @JoinColumn(name = "customer_id")
     private User customer;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "lawyer_id")
-    private User lawyer;
 }
