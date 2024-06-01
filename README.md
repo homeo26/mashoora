@@ -56,3 +56,37 @@ In able to run the application fully, These are the prerequisites:
    # cd into the directory of the AdelChatbot.py file and python3 it
    python3 mashoora/src/main/python/AdelChatbot.py
    ```
+8. *[Optional]* inable to enable HTTPS run the following commands:
+   1. install `mkcert`
+      1. on **macOS**:
+      2. ```bash
+         brew install mkcert
+         brew install nss # If you use Firefox
+         ```
+   2. ```bash
+      # cd into the maven project
+      cd mashoora/mashoora
+      ```
+   3. ```bash
+      # Create and Install a Local CA:
+      mkcert -install
+      ```
+   4. ```bash
+      # Generate Certificates for localhost:
+      mkcert localhost
+      ```
+   5. ```bash
+      # Convert the PEM files to a PKCS12 keystore:
+      openssl pkcs12 -export -out keystore.p12 -inkey localhost-key.pem -in localhost.pem -name tomcat
+      # password = mashoora-zfx1
+      ```
+   6. ```bash
+      # Create the ssl directory under src/main/resources and move the keystore.p12 file there:
+      mkdir -p src/main/resources/ssl
+      mv keystore.p12 src/main/resources/ssl/
+      ```
+   7. ```bash
+      # Clean and rebuild your project to ensure it picks up the new resources:
+      ./mvnw clean package
+      ./mvnw spring-boot:run
+      ```
