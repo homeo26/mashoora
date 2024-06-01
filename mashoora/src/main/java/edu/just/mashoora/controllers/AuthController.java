@@ -42,10 +42,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 86400)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    // TODO: Migrate the logic of all controllers to Services directory
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -67,8 +69,6 @@ public class AuthController {
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
-
-    // TODO: Migrate the logic of all controllers to Services directory
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -100,7 +100,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
 
         String username = signUpRequest.getUsername();
         String email = signUpRequest.getEmail();
@@ -146,7 +146,7 @@ public class AuthController {
             roles.add(customerRole);
         } else {
             strRoles.forEach(role -> {
-                switch (role) {
+                switch (role.toLowerCase()) {
                     case "admin":
                         Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
@@ -174,13 +174,15 @@ public class AuthController {
         String verificationToken = UUID.randomUUID().toString();
         savedUser.setVerificationToken(verificationToken);
         userRepository.save(savedUser);
+        try {
+            // Send verification email
+            emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getId(), verificationToken);
+            return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email for verification."));
+        }catch (Exception e){
+            return ResponseEntity.ok(new MessageResponse("User registered successfully, But failed to send a verification email."));
+        }
 
-        // Send verification email
-        emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getId(), verificationToken);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email for verification."));
     }
-    // <YOUR_GithubPersonalAccessToken_HERE
 
     @GetMapping("/checkLawyerDetails")
     @PreAuthorize("hasRole('LAWYER')")

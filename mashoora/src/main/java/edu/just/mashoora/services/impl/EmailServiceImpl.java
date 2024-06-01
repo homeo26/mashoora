@@ -1,6 +1,7 @@
 package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.constants.Constants;
+import edu.just.mashoora.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
