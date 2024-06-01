@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
@@ -60,5 +61,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         changePasswordOTPRepository.delete(changePasswordOTP);
         return true;
+    }
+
+    public BigDecimal getBalanceByUsername(String username) {
+        return userRepository.findByUsername(username).get().getBalance();
     }
 }
