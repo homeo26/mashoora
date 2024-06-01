@@ -1,11 +1,11 @@
 package edu.just.mashoora.services.impl;
 
-import edu.just.mashoora.components.Comment;
-import edu.just.mashoora.components.Question;
+import edu.just.mashoora.components.*;
 import edu.just.mashoora.models.User;
 import edu.just.mashoora.payload.request.CommentRequest;
 import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.repository.CommentRepository;
+import edu.just.mashoora.repository.CommentVoteRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.CommentService;
@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentVoteRepository commentVoteRepository;
 
     @Transactional
     public CommentResponse postComment(Long questionId, CommentRequest commentRequest) {
@@ -60,10 +65,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
-    public CommentResponse getCommentById(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + commentId));
-        return new CommentResponse(comment);
+    @Transactional
+    public Comment getCommentById(Long commentId) {
+
+        Optional<Comment> comment = commentRepository.findCommentById(commentId);
+        if(comment == null) throw new NoSuchElementException("Comment with id " + commentId + " not found");
+
+        return comment.get();
     }
 
     @Override
@@ -73,4 +81,22 @@ public class CommentServiceImpl implements CommentService {
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
     }
+
+    public boolean VoteOnComment(User user,Comment comment, boolean vote){
+        Optional<CommentVote> existingVoteOpt = commentVoteRepository.findByUserAndComment(user, comment);
+        CommentVote commentVote;
+
+        if (existingVoteOpt.isPresent()) {
+            commentVote = existingVoteOpt.get();
+            commentVote.setVote(vote); // Update the vote
+        } else {
+            commentVote = new CommentVote();
+            commentVote.setUser(user);
+            commentVote.setComment(comment);
+            commentVote.setVote(vote); // Set the vote
+        }
+        commentVoteRepository.save(commentVote);
+        return true;
+    }
+
 }
