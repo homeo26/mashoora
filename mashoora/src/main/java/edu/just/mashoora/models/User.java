@@ -68,6 +68,7 @@ public class User {
 
     private boolean enabled = false;
 
+    @Column(name = "approved")
     private boolean approved = false;
 
     private String verificationToken;

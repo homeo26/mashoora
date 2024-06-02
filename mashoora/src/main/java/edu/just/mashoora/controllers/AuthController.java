@@ -241,7 +241,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/approveLawyer")
+    @GetMapping("/approveLawyer/{lawyer_Id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> approveLawyer(@PathVariable("lawyer_Id") Long lawyerId){
         User user = userRepository.findById(lawyerId)
