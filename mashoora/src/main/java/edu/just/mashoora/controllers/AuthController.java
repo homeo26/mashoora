@@ -255,7 +255,7 @@ public class AuthController {
     public ResponseEntity<?> listPendingLawyers(){
         try {
             List<User> lawyers = userDetailsService.getAllLawyer();
-            List<User> pendingLawyers = userDetailsService
+            List<PendingLawersResponse> pendingLawyers = userDetailsService
                     .getLawyersByApprovedState(false, lawyers);
             return ResponseEntity.ok(pendingLawyers);
         }catch (Exception ex){

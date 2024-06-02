@@ -2,6 +2,7 @@ package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.ChangePasswordOTP;
 import edu.just.mashoora.models.User;
+import edu.just.mashoora.payload.response.PendingLawersResponse;
 import edu.just.mashoora.repository.ChangePasswordOTPRepository;
 import edu.just.mashoora.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,11 +83,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return users;
     }
-    public List<User> getLawyersByApprovedState(boolean approved, List<User> lawyers){
-        List<User> pendingLawyers = new ArrayList<>();
+    public List<PendingLawersResponse> getLawyersByApprovedState(boolean approved, List<User> lawyers){
+        List<PendingLawersResponse> pendingLawers =
+                new ArrayList<>();
         for(User lawyer : lawyers){
-            if(!lawyer.isApproved())    pendingLawyers.add(lawyer);
+            if(!lawyer.isApproved()){
+                pendingLawers.add(
+                        PendingLawersResponse.builder()
+                                .firstName(lawyer.getFirstName())
+                                .lastName(lawyer.getLastName())
+                                .id(lawyer.getId())
+                                .username(lawyer.getUsername())
+                                .build()
+                );
+            }
         }
-        return pendingLawyers;
+
+        return pendingLawers;
     }
 }

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PendingLawersResponse {
+    private String firstName;
+    private String lastName;
     private Long id;
     private String username;
 
