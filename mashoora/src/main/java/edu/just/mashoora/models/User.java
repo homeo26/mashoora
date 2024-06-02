@@ -68,6 +68,8 @@ public class User {
 
     private boolean enabled = false;
 
+    private boolean approved = false;
+
     private String verificationToken;
 
     @OneToOne(mappedBy = "user")

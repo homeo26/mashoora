@@ -10,6 +10,7 @@ import edu.just.mashoora.payload.request.LoginRequest;
 import edu.just.mashoora.payload.request.SignupRequest;
 import edu.just.mashoora.payload.response.JwtResponse;
 import edu.just.mashoora.payload.response.MessageResponse;
+import edu.just.mashoora.payload.response.PendingLawersResponse;
 import edu.just.mashoora.repository.RoleRepository;
 import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.impl.EmailServiceImpl;
@@ -31,10 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 86400)
@@ -243,14 +241,28 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/disable")
+    @GetMapping("/approveLawyer")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> disableLawyer(@PathVariable("lawyer_Id") Long lawyerId){
+    public ResponseEntity<?> approveLawyer(@PathVariable("lawyer_Id") Long lawyerId){
         User user = userRepository.findById(lawyerId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setEnabled(false);
-        userRepository.save(user);
-        return ResponseEntity.ok("User verified cancelled");
+        userDetailsService.approveLawyerReport(user, true);
+        return ResponseEntity.ok("Lawyer Report approved");
     }
+
+    @GetMapping("/notApproved")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> listPendingLawyers(){
+        try {
+            List<User> lawyers = userDetailsService.getAllLawyer();
+            List<User> pendingLawyers = userDetailsService
+                    .getLawyersByApprovedState(false, lawyers);
+            return ResponseEntity.ok(pendingLawyers);
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+
 
 }

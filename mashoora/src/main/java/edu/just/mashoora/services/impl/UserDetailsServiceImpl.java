@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -65,5 +67,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public BigDecimal getBalanceByUsername(String username) {
         return userRepository.findByUsername(username).get().getBalance();
+    }
+
+    public void approveLawyerReport(User user, boolean approve){
+        user.setApproved(approve);
+        userRepository.save(user);
+    }
+
+    public List<User> getAllLawyer(){
+        List<Long> lawyersIdList = userRepository.findUserIdsByRoleId(2);
+        List<User> users = new ArrayList<>();
+        for(Long id : lawyersIdList)
+            users.add(userRepository.findById(id).get());
+
+        return users;
+    }
+    public List<User> getLawyersByApprovedState(boolean approved, List<User> lawyers){
+        List<User> pendingLawyers = new ArrayList<>();
+        for(User lawyer : lawyers){
+            if(!lawyer.isApproved())    pendingLawyers.add(lawyer);
+        }
+        return pendingLawyers;
     }
 }
