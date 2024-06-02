@@ -1,12 +1,15 @@
 package edu.just.mashoora.services.impl;
 
 import edu.just.mashoora.components.Comment;
+import edu.just.mashoora.components.CommentVote;
+import edu.just.mashoora.components.CommentVotesCounts;
 import edu.just.mashoora.components.Question;
 import edu.just.mashoora.models.User;
 import edu.just.mashoora.payload.request.QuestionRequest;
 import edu.just.mashoora.payload.response.CommentResponse;
 import edu.just.mashoora.payload.response.QuestionResponse;
 import edu.just.mashoora.repository.CommentRepository;
+import edu.just.mashoora.repository.CommentVoteRepository;
 import edu.just.mashoora.repository.QuestionRepository;
 import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.QuestionService;
@@ -33,6 +36,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    private CommentVoteRepository commentVoteRepository;
 
     @Transactional
     public QuestionResponse postQuestion(QuestionRequest questionRequest) {
@@ -71,15 +77,18 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionResponse getQuestionById(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + questionId));
-
         return new QuestionResponse(question);
     }
 
     @Override
     public List<CommentResponse> getAllCommentsOfQuestion(Long questionId) {
         List<Comment> comments = commentRepository.findByQuestionId(questionId);
+
         return comments.stream()
-                .map(CommentResponse::new)
+                .map(comment -> {
+                    CommentVotesCounts vote = getCommentVotes(comment.getId());
+                    return new CommentResponse(comment, vote);
+                })
                 .collect(Collectors.toList());
     }
     @Override
@@ -88,5 +97,16 @@ public class QuestionServiceImpl implements QuestionService {
         Page<Question> questionPage = questionRepository.findAllByOrderByTimestampDesc(pageable);
 
         return questionPage.map(QuestionResponse::new);
+    }
+    @Override
+    public CommentVotesCounts getCommentVotes(Long commentId){
+        int countTrue = commentVoteRepository.countByIdAndVoteTrue(commentId);
+        int countFalse = commentVoteRepository.countByIdAndVoteFalse(commentId);
+        CommentVotesCounts report = CommentVotesCounts.builder()
+                .upVotes(countTrue)
+                .downVotes(countFalse)
+                .id(commentId)
+                .build();
+        return report;
     }
 }
