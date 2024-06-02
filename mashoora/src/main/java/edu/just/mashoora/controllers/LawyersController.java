@@ -9,6 +9,10 @@ import edu.just.mashoora.repository.UserRepository;
 import edu.just.mashoora.services.RatingService;
 import edu.just.mashoora.services.impl.RatingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -169,6 +175,33 @@ public class LawyersController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
+    }
+
+    @GetMapping("/downloadPdf/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<InputStreamResource> downloadPdf(@PathVariable Long userId) {
+        try {
+            String fileName = userId + ".pdf";
+            Path filePath = Paths.get("uploads", fileName);
+
+            // Check if the file exists
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Set up file content type and headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", fileName);
+
+            // Create input stream resource from the file
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(filePath.toFile()));
+
+            return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            // Handle file IO exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

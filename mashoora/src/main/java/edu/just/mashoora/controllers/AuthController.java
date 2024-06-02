@@ -24,14 +24,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -246,6 +241,16 @@ public class AuthController {
         } else {
             return ResponseEntity.badRequest().body("Invalid verification token");
         }
+    }
+
+    @GetMapping("/disable")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> disableLawyer(@PathVariable("lawyer_Id") Long lawyerId){
+        User user = userRepository.findById(lawyerId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setEnabled(false);
+        userRepository.save(user);
+        return ResponseEntity.ok("User verified cancelled");
     }
 
 }
