@@ -139,4 +139,12 @@ public class LawyersController {
         return ResponseEntity.ok("Law Fields Speciality Updated");
     }
 
+    @GetMapping("myStrengths")
+    @PreAuthorize("hasRole('LAWYER')")
+    public ResponseEntity<List<String>> getLawyerStrength(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).get();
+        return ResponseEntity.ok(ratingService.getLawyerStrength(user));
+    }
+
 }

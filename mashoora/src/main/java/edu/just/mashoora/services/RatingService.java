@@ -38,4 +38,5 @@ public interface RatingService {
                               Boolean internationalLaw, Boolean criminalLaw, Boolean administrativeAndFinancialLaw,
                               Boolean constitutionalLaw, Boolean privateInternationalLaw, Boolean proceduralLaw);
 
+    List<String> getLawyerStrength(User user);
 }

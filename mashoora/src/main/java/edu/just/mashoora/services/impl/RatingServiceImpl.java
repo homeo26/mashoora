@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -278,6 +279,28 @@ public class RatingServiceImpl implements RatingService {
             for (ELawTypes field : fields) {
                 setLawyerStrength(id, field, true);
             }
+        }
+    }
+
+    public List<String> getLawyerStrength(User user){
+        Optional<LawyerStrength> lawyerStrengthOpt = lawyerStrengthRepository.findByUser(user);
+
+        if (lawyerStrengthOpt.isPresent()) {
+            LawyerStrength lawyerStrength = lawyerStrengthOpt.get();
+            List<String> strengths = new ArrayList<>();
+
+            if (lawyerStrength.isCivilLaw()) strengths.add("Civil Law");
+            if (lawyerStrength.isCriminalLaw()) strengths.add("Criminal Law");
+            if (lawyerStrength.isCommercialLaw()) strengths.add("Commercial Law");
+            if (lawyerStrength.isInternationalLaw()) strengths.add("International Law");
+            if (lawyerStrength.isAdministrativeAndFinancialLaw()) strengths.add("Administrative and Financial Law");
+            if (lawyerStrength.isConstitutionalLaw()) strengths.add("Constitutional Law");
+            if (lawyerStrength.isPrivateInternationalLaw()) strengths.add("Private International Law");
+            if (lawyerStrength.isProceduralLaw()) strengths.add("Procedural Law");
+
+            return strengths;
+        } else {
+            return Collections.emptyList(); // or throw an exception if appropriate
         }
     }
 }
