@@ -21,8 +21,6 @@ public class CommentVote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @NotBlank
     @NotNull
     private boolean vote;
 

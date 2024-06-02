@@ -100,8 +100,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
     @Override
     public CommentVotesCounts getCommentVotes(Long commentId){
-        int countTrue = commentVoteRepository.countByIdAndVoteTrue(commentId);
-        int countFalse = commentVoteRepository.countByIdAndVoteFalse(commentId);
+        int countTrue = commentVoteRepository.countByCommentIdAndVoteTrue(commentId);
+        int countFalse = commentVoteRepository.countByCommentIdAndVoteFalse(commentId);
         CommentVotesCounts report = CommentVotesCounts.builder()
                 .upVotes(countTrue)
                 .downVotes(countFalse)

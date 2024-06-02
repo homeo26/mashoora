@@ -1,5 +1,6 @@
 package edu.just.mashoora.components;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import edu.just.mashoora.models.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,6 +43,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "question_id", nullable = false)
+    @JsonBackReference
     private Question question;
 
     @CreationTimestamp

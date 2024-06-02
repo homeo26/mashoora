@@ -1,5 +1,6 @@
 package edu.just.mashoora.components;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.just.mashoora.models.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,6 +50,7 @@ public class Question {
     private User user;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Comment> comments = new ArrayList<>();
 
     @CreationTimestamp
