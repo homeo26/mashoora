@@ -31,59 +31,74 @@ public class ChatbotController {
 
     @PostMapping("/query")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
-    public ResponseEntity<StandardResponse<?>> sendQuery(@Valid @RequestBody ChatbotQueryRequest request) {
+    public ResponseEntity<StandardResponse<ChatbotQueryResponse>> sendQuery(@Valid @RequestBody ChatbotQueryRequest request) {
         StandardResponse<ChatbotQueryResponse> response = new StandardResponse<>();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Long senderId = userDetails.getId();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            Long senderId = userDetails.getId();
 
-        ChatbotQueryResponse botResponse = chatbotService.sendQuery(senderId, request);
-        response.setStatus(HttpStatus.CREATED.getReasonPhrase());
-        response.setStatusCode(HttpStatus.CREATED.value());
-        response.setDetailedStatusCode("Query Sent successfully");
-        response.setData(botResponse);
+            ChatbotQueryResponse botResponse = chatbotService.sendQuery(senderId, request);
+            response.setStatus("success");
+            response.setStatusCode(HttpStatus.CREATED.value());
+            response.setDetailedStatusCode("Query Sent successfully");
+            response.setData(botResponse);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setDetailedStatusCode("Query Failed");
+        }
 
-        return ResponseEntity.status(HttpStatus.CREATED.value()).body(response);
-
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @GetMapping("/history")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
-    public ResponseEntity<?> getChatHistory() {
+    public ResponseEntity<StandardResponse<List<ChatbotMessage>>> getChatHistory() {
         StandardResponse<List<ChatbotMessage>> response = new StandardResponse<>();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Long senderId = userDetails.getId();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            Long senderId = userDetails.getId();
 
-        List<ChatbotMessage> history = chatbotService.getQueriesBySenderId(senderId);
-        response.setStatus(HttpStatus.OK.getReasonPhrase());
-        response.setStatusCode(HttpStatus.OK.value());
-        response.setDetailedStatusCode("History retrieved successfully");
-        response.setData(history);
+            List<ChatbotMessage> history = chatbotService.getQueriesBySenderId(senderId);
+            response.setStatus("success");
+            response.setStatusCode(HttpStatus.OK.value());
+            response.setDetailedStatusCode("History retrieved successfully");
+            response.setData(history);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setDetailedStatusCode("Failed to retrieve history");
+        }
 
-        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @DeleteMapping("/history")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('LAWYER') or hasRole('ADMIN')")
-    public ResponseEntity<?> deleteChatHistory() {
-
+    public ResponseEntity<StandardResponse<String>> deleteChatHistory() {
         StandardResponse<String> response = new StandardResponse<>();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Long senderId = userDetails.getId();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            Long senderId = userDetails.getId();
 
-        chatbotService.deleteBySenderId(senderId);
+            chatbotService.deleteBySenderId(senderId);
 
-        response.setStatus(HttpStatus.OK.getReasonPhrase());
-        response.setStatusCode(HttpStatus.OK.value());
-        response.setDetailedStatusCode("History deleted successfully");
-        response.setData("Chat history with adel was deleted successfully");
+            response.setStatus("success");
+            response.setStatusCode(HttpStatus.OK.value());
+            response.setDetailedStatusCode("History deleted successfully");
+            response.setData("Chat history with Adel was deleted successfully");
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setDetailedStatusCode("Failed to delete history");
+        }
 
-        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
-
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 }

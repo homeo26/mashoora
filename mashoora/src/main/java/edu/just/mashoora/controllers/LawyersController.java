@@ -30,6 +30,8 @@ import java.util.List;
 @RequestMapping("/api/lawyers")
 public class LawyersController {
 
+    // TODO: Migrate the logic of all controllers to Services directory
+
     private final RatingService ratingService;
     private final UserRepository userRepository;
 
