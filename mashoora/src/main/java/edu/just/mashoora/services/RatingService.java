@@ -7,6 +7,7 @@ import edu.just.mashoora.models.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface RatingService {
@@ -19,10 +20,10 @@ public interface RatingService {
 
     Rating getRating(Long id);
 
-    ArrayList<ELawTypes> selectedAttributes(Boolean civilLaw, Boolean commercialLaw,
-                                            Boolean internationalLaw, Boolean criminalLaw,
-                                            Boolean administrativeAndFinancialLaw, Boolean constitutionalLaw,
-                                            Boolean privateInternationalLaw, Boolean proceduralLaw);
+    ArrayList<ELawTypes> selectedAttributes(Integer civilLaw, Integer commercialLaw,
+                                            Integer internationalLaw, Integer criminalLaw,
+                                            Integer administrativeAndFinancialLaw, Integer constitutionalLaw,
+                                            Integer privateInternationalLaw, Integer proceduralLaw);
 
     List<String> getTopRatingFields(Long id);
 
@@ -38,5 +39,12 @@ public interface RatingService {
                               Boolean internationalLaw, Boolean criminalLaw, Boolean administrativeAndFinancialLaw,
                               Boolean constitutionalLaw, Boolean privateInternationalLaw, Boolean proceduralLaw);
 
+    HashMap<ELawTypes, Integer> mapLawtypeToValue(Integer civilLaw, Integer commercialLaw,
+                                                  Integer internationalLaw, Integer criminalLaw,
+                                                  Integer administrativeAndFinancialLaw, Integer constitutionalLaw,
+                                                  Integer privateInternationalLaw, Integer proceduralLaw);
     List<String> getLawyerStrength(User user);
+
+    void rateLawyer(Long lawyerId, HashMap<ELawTypes, Integer> rateMap);
+
 }

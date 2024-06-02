@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -147,6 +148,27 @@ public class LawyersController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).get();
         return ResponseEntity.ok(ratingService.getLawyerStrength(user));
+    }
+
+    @PostMapping("/rateLawyer")
+    public ResponseEntity<String> giveLawyerFeedback(@RequestParam(value = "lawyer_Id", required = true) Long lawyerId,
+                                                     @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
+                                                     @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
+                                                     @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
+                                                     @RequestParam(value = "criminalLaw", required = false) Integer criminalLaw,
+                                                     @RequestParam(value = "administrativeAndFinancialLaw", required = false) Integer administrativeAndFinancialLaw,
+                                                     @RequestParam(value = "constitutionalLaw", required = false) Integer constitutionalLaw,
+                                                     @RequestParam(value = "privateInternationalLaw", required = false) Integer privateInternationalLaw,
+                                                     @RequestParam(value = "proceduralLaw", required = false) Integer proceduralLaw){
+        HashMap<ELawTypes, Integer> map = ratingService.mapLawtypeToValue(civilLaw, commercialLaw, internationalLaw, criminalLaw,
+                administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
+        try {
+            ratingService.rateLawyer(lawyerId, map);
+            return ResponseEntity.ok("lawyer rated successfully");
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
     }
 
 }

@@ -146,8 +146,8 @@ public class RatingServiceImplTest {
         Boolean proceduralLaw = true;
 
         var result = ratingService.selectedAttributes(
-                civilLaw, commercialLaw, internationalLaw, criminalLaw,
-                administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
+                (civilLaw?1:null), (commercialLaw?1:null), (internationalLaw?1:null), (criminalLaw?1:null),
+                (administrativeAndFinancialLaw?1:null), (constitutionalLaw?1:null), (privateInternationalLaw?1:null), (proceduralLaw?1:null));
 
         assertEquals(6, result.size());
         assertTrue(result.contains(ELawTypes.CIVIL_LAW));

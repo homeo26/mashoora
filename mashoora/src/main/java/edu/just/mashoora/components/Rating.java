@@ -95,7 +95,7 @@ public class Rating {
     private float calculateFieldRating(float fieldRating, int fieldCounter) {
         if (fieldCounter == 0)
             return fieldRating;
-        return (fieldRating - 5) / fieldCounter;
+        return fieldRating / fieldCounter;
     }
 
     public void fixRatings() {

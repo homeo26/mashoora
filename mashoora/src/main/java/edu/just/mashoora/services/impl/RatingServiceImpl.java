@@ -14,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RatingServiceImpl implements RatingService {
@@ -36,6 +33,14 @@ public class RatingServiceImpl implements RatingService {
         this.lawyerStrengthRepository = lawyerStrengthRepository;
     }
 
+    public void rateLawyer(Long lawyerId, HashMap<ELawTypes, Integer> rateMap) {
+        for (Map.Entry<ELawTypes, Integer> entry : rateMap.entrySet()) {
+            ELawTypes lawType = entry.getKey();
+            Integer rating = entry.getValue();
+            saveRating(lawyerId, lawType, rating);
+            increaseCasesCount(lawyerId, lawType);
+        }
+    }
 
     public void saveRating(Long id, ELawTypes field, int rate) {
         Rating rating = getRating(id);
@@ -116,22 +121,22 @@ public class RatingServiceImpl implements RatingService {
                 rating.setCommercialCasesCounter(rating.getCommercialCasesCounter() + 1);
                 break;
             case INTERNATIONAL_LAW:
-                rating.setInternationalLawRating(rating.getInternationalCasesCounter() + 1);
+                rating.setInternationalCasesCounter(rating.getInternationalCasesCounter() + 1);
                 break;
             case CRIMINAL_LAW:
-                rating.setCriminalLawRating(rating.getCriminalCasesCounter() + 1);
+                rating.setCriminalCasesCounter(rating.getCriminalCasesCounter() + 1);
                 break;
             case ADMINISTRATIVE_AND_FINANCE_LAW:
-                rating.setAdministrativeAndFinancialLawRating(rating.getAdministrativeAndFinancialCasesCounter() + 1);
+                rating.setAdministrativeAndFinancialCasesCounter(rating.getAdministrativeAndFinancialCasesCounter() + 1);
                 break;
             case CONSTITUTIONAL_LAW:
-                rating.setConstitutionalLawRating(rating.getConstitutionalCasesCounter() + 1);
+                rating.setConstitutionalCasesCounter(rating.getConstitutionalCasesCounter() + 1);
                 break;
             case PRIVATE_INTERNATIONAL_LAW:
-                rating.setPrivateInternationalLawRating(rating.getPrivateInternationalCasesCounter() + 1);
+                rating.setPrivateInternationalCasesCounter(rating.getPrivateInternationalCasesCounter() + 1);
                 break;
             case PROCEDURAL_LAW:
-                rating.setProceduralLawRating(rating.getProceduralCasesCounter() + 1);
+                rating.setProceduralCasesCounter(rating.getProceduralCasesCounter() + 1);
                 break;
         }
         ratingRepository.save(rating);
@@ -148,10 +153,10 @@ public class RatingServiceImpl implements RatingService {
         return rating;
     }
 
-    public ArrayList<ELawTypes> selectedAttributes(Boolean civilLaw, Boolean commercialLaw,
-                                                   Boolean internationalLaw, Boolean criminalLaw,
-                                                   Boolean administrativeAndFinancialLaw, Boolean constitutionalLaw,
-                                                   Boolean privateInternationalLaw, Boolean proceduralLaw) {
+    public ArrayList<ELawTypes> selectedAttributes(Integer civilLaw, Integer commercialLaw,
+                                                   Integer internationalLaw, Integer criminalLaw,
+                                                   Integer administrativeAndFinancialLaw, Integer constitutionalLaw,
+                                                   Integer privateInternationalLaw, Integer proceduralLaw) {
         ArrayList<ELawTypes> fields = new ArrayList<>();
         if (civilLaw != null) fields.add(ELawTypes.CIVIL_LAW);
         if (commercialLaw != null) fields.add(ELawTypes.COMMERCIAL_LAW);
@@ -161,6 +166,24 @@ public class RatingServiceImpl implements RatingService {
         if (constitutionalLaw != null) fields.add(ELawTypes.CONSTITUTIONAL_LAW);
         if (privateInternationalLaw != null) fields.add(ELawTypes.PRIVATE_INTERNATIONAL_LAW);
         if (proceduralLaw != null) fields.add(ELawTypes.PROCEDURAL_LAW);
+        return fields;
+    }
+
+    public HashMap<ELawTypes, Integer> mapLawtypeToValue(Integer civilLaw, Integer commercialLaw,
+                                                          Integer internationalLaw, Integer criminalLaw,
+                                                          Integer administrativeAndFinancialLaw, Integer constitutionalLaw,
+                                                          Integer privateInternationalLaw, Integer proceduralLaw) {
+        HashMap<ELawTypes, Integer> fields = new HashMap<>();
+
+        if (civilLaw != null) fields.put(ELawTypes.CIVIL_LAW, civilLaw);
+        if (commercialLaw != null) fields.put(ELawTypes.COMMERCIAL_LAW, commercialLaw);
+        if (internationalLaw != null) fields.put(ELawTypes.INTERNATIONAL_LAW, internationalLaw);
+        if (criminalLaw != null) fields.put(ELawTypes.CRIMINAL_LAW, criminalLaw);
+        if (administrativeAndFinancialLaw != null) fields.put(ELawTypes.ADMINISTRATIVE_AND_FINANCE_LAW, administrativeAndFinancialLaw);
+        if (constitutionalLaw != null) fields.put(ELawTypes.CONSTITUTIONAL_LAW, constitutionalLaw);
+        if (privateInternationalLaw != null) fields.put(ELawTypes.PRIVATE_INTERNATIONAL_LAW, privateInternationalLaw);
+        if (proceduralLaw != null) fields.put(ELawTypes.PROCEDURAL_LAW, proceduralLaw);
+
         return fields;
     }
 
@@ -231,16 +254,22 @@ public class RatingServiceImpl implements RatingService {
     public List<User> getFieldStrongLawyers(ELawTypes field) {
         List<LawyerStrength> lawyerStrengths = new ArrayList<>();
         switch (field) {
-            case CIVIL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCivilLawTrue();
-            case COMMERCIAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCommercialLawTrue();
-            case INTERNATIONAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByInternationalLawTrue();
-            case CRIMINAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByCriminalLawTrue();
+            case CIVIL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByCivilLawTrue();
+            case COMMERCIAL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByCommercialLawTrue();
+            case INTERNATIONAL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByInternationalLawTrue();
+            case CRIMINAL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByCriminalLawTrue();
             case ADMINISTRATIVE_AND_FINANCE_LAW ->
                     lawyerStrengths = lawyerStrengthRepository.findAllByAdministrativeAndFinancialLawTrue();
-            case CONSTITUTIONAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByConstitutionalLawTrue();
+            case CONSTITUTIONAL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByConstitutionalLawTrue();
             case PRIVATE_INTERNATIONAL_LAW ->
                     lawyerStrengths = lawyerStrengthRepository.findAllByPrivateInternationalLawTrue();
-            case PROCEDURAL_LAW -> lawyerStrengths = lawyerStrengthRepository.findAllByProceduralLawTrue();
+            case PROCEDURAL_LAW ->
+                    lawyerStrengths = lawyerStrengthRepository.findAllByProceduralLawTrue();
             default -> {
             }
         }
@@ -270,9 +299,9 @@ public class RatingServiceImpl implements RatingService {
     public void updateLawyerStrength(Long id, Boolean civilLaw, Boolean commercialLaw,
                                      Boolean internationalLaw, Boolean criminalLaw, Boolean administrativeAndFinancialLaw,
                                      Boolean constitutionalLaw, Boolean privateInternationalLaw, Boolean proceduralLaw) {
-        List<ELawTypes> fields = selectedAttributes(civilLaw, commercialLaw,
-                internationalLaw, criminalLaw, administrativeAndFinancialLaw,
-                constitutionalLaw, privateInternationalLaw, proceduralLaw);
+        List<ELawTypes> fields = selectedAttributes((civilLaw?1:null), (commercialLaw?1:null),
+                (internationalLaw?1:null), (criminalLaw?1:null), (administrativeAndFinancialLaw?1:null),
+                (constitutionalLaw?1:null), (privateInternationalLaw?1:null), (proceduralLaw?1:null));
 
         resetLawyerStrength(id);
         if (!fields.isEmpty()) {
