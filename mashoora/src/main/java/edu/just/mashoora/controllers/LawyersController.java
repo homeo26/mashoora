@@ -157,7 +157,7 @@ public class LawyersController {
     }
 
     @PostMapping("/rateLawyer")
-    public ResponseEntity<String> giveLawyerFeedback(@RequestParam(value = "lawyer_Id", required = true) Long lawyerId,
+    public ResponseEntity<String> giveLawyerFeedback(@RequestParam(value = "username", required = true) String username,
                                                      @RequestParam(value = "civilLaw", required = false) Integer civilLaw,
                                                      @RequestParam(value = "commercialLaw", required = false) Integer commercialLaw,
                                                      @RequestParam(value = "internationalLaw", required = false) Integer internationalLaw,
@@ -169,7 +169,8 @@ public class LawyersController {
         HashMap<ELawTypes, Integer> map = ratingService.mapLawtypeToValue(civilLaw, commercialLaw, internationalLaw, criminalLaw,
                 administrativeAndFinancialLaw, constitutionalLaw, privateInternationalLaw, proceduralLaw);
         try {
-            ratingService.rateLawyer(lawyerId, map);
+            User user = userRepository.findByUsername(username).get();
+            ratingService.rateLawyer(user.getId(), map);
             return ResponseEntity.ok("lawyer rated successfully");
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
